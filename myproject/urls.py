@@ -11,29 +11,58 @@ from django.core.management import call_command
 
 # Data loading view (temporary - remove after use)
 def load_all_data(request):
-    SECRET_KEY = "kushi_rishu_060910"  # Change this to something random
-    if request.GET.get('key') != SECRET_KEY:
-        return HttpResponse("Access denied. Invalid key.", status=403)
+    """Visit this URL to load all 47 courses into Render database"""
+    # Secret key for security
+    SECRET_KEY = "kushi_rishu_060910"
     
-    from base.models import LearningPath
-    before = LearningPath.objects.count()
+    # Only allow if secret key matches
+    if request.GET.get('key') != SECRET_KEY:
+        return HttpResponse("Access denied. Invalid or missing secret key.", status=403)
     
     try:
-        call_command('loaddata', 'complete_data.json', verbosity=2)
-        after = LearningPath.objects.count()
-        return HttpResponse(f"""
+        from base.models import LearningPath, ProgrammingLanguage
+        
+        # Show current counts
+        initial_courses = LearningPath.objects.count()
+        initial_langs = ProgrammingLanguage.objects.count()
+        
+        # Load the data - IGNORE existing records
+        call_command('loaddata', 'complete_data.json', verbosity=2, ignorenonexistent=True)
+        
+        final_courses = LearningPath.objects.count()
+        final_langs = ProgrammingLanguage.objects.count()
+        
+        response = f"""
         <html>
+        <head><title>Data Load Complete</title></head>
         <body style="font-family: Arial; padding: 20px;">
             <h1>✅ Data Load Complete</h1>
-            <p>Courses before: {before}</p>
-            <p>Courses after: {after}</p>
-            <p>Added: {after - before} courses</p>
-            <a href="/learn/">View courses →</a>
+            <h2>Courses:</h2>
+            <p><strong>Before:</strong> {initial_courses}</p>
+            <p><strong>After:</strong> {final_courses}</p>
+            <p><strong>Added:</strong> {final_courses - initial_courses}</p>
+            <h2>Languages:</h2>
+            <p><strong>Before:</strong> {initial_langs}</p>
+            <p><strong>After:</strong> {final_langs}</p>
+            <p><strong>Added:</strong> {final_langs - initial_langs}</p>
+            <hr>
+            <p><a href="/learn/">View all courses →</a></p>
+            <p><a href="/debug/count/">Check counts →</a></p>
         </body>
         </html>
-        """)
+        """
+        return HttpResponse(response)
     except Exception as e:
-        return HttpResponse(f"Error: {e}", status=500)
+        return HttpResponse(f"""
+        <html>
+        <head><title>Data Load Error</title></head>
+        <body style="font-family: Arial; padding: 20px;">
+            <h1>❌ Error Loading Data</h1>
+            <pre>{str(e)}</pre>
+            <p><a href="/debug/count/">Check current counts →</a></p>
+        </body>
+        </html>
+        """, status=500)
 
 def debug_count(request):
     from base.models import LearningPath, Lesson, Challenge
