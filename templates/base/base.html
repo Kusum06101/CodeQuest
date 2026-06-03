@@ -4,33 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     
-    <!-- Strong Cache Control - Prevent any caching -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, private">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <meta http-equiv="Cache" content="no-cache">
-    
     <title>{% block title %}CodeQuest - Learn Programming in Space!{% endblock %}</title>
     
     {% load static %}
-    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    
-    <!-- Space Theme Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- CSS - Add version parameter to force reload -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3">
-    
-    <!-- Code Highlighting -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    
-    <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* Reset & Base */
+        /* Critical Mobile-First Styles */
         * {
             margin: 0;
             padding: 0;
@@ -42,9 +26,10 @@
             background: #0a0a2a;
             color: white;
             overflow-x: hidden;
+            width: 100%;
         }
         
-        /* Mobile Menu Button - Hidden on desktop */
+        /* Mobile Menu Button */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -52,14 +37,13 @@
             color: white;
             font-size: 1.8rem;
             cursor: pointer;
-            padding: 0.5rem;
-            z-index: 1001;
+            padding: 8px 12px;
         }
         
-        /* Navbar Styles - Mobile First */
+        /* Navbar - Mobile First */
         .navbar {
             background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 100%);
-            padding: 0.8rem 1rem;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -76,26 +60,23 @@
             color: white;
             text-decoration: none;
             font-family: 'Orbitron', monospace;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-            transition: all 0.3s ease;
         }
         
         .nav-links {
             display: flex;
-            gap: 0.5rem;
+            gap: 8px;
             align-items: center;
             flex-wrap: wrap;
         }
         
-        .nav-links a, .nav-links button, .logout-btn {
+        .nav-links a, .nav-links button {
             text-decoration: none;
             color: white;
-            transition: all 0.3s;
-            font-weight: 500;
             padding: 8px 12px;
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 13px;
             background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
         }
         
         /* Mobile Styles */
@@ -108,20 +89,24 @@
                 display: none;
                 width: 100%;
                 flex-direction: column;
-                gap: 0.5rem;
-                margin-top: 1rem;
+                gap: 8px;
+                margin-top: 12px;
                 max-height: 70vh;
                 overflow-y: auto;
+                padding-bottom: 10px;
             }
             
             .nav-links.show {
                 display: flex;
             }
             
-            .nav-links a, .nav-links button, .logout-btn {
+            .nav-links a, .nav-links button, .logout-form {
                 width: 100%;
                 text-align: center;
-                padding: 12px;
+            }
+            
+            .nav-links a, .nav-links button {
+                padding: 10px;
             }
             
             .admin-dropdown {
@@ -131,20 +116,19 @@
             .admin-dropdown-content {
                 position: static;
                 width: 100%;
-                margin-top: 0.5rem;
-                box-shadow: none;
-                background: rgba(255, 255, 255, 0.05);
+                margin-top: 5px;
+                background: rgba(255, 255, 255, 0.08);
             }
             
             .admin-toggle {
                 display: block;
                 width: 100%;
                 text-align: center;
-                padding: 12px;
+                padding: 10px;
             }
         }
         
-        /* Admin Dropdown Styles */
+        /* Admin Dropdown */
         .admin-dropdown {
             position: relative;
             display: inline-block;
@@ -156,16 +140,13 @@
             display: inline-block;
             color: #ffd93d;
             font-weight: 500;
-            transition: all 0.3s;
-            border-radius: 8px;
         }
         
         .admin-dropdown-content {
             display: none;
             position: absolute;
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            min-width: 220px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            min-width: 200px;
             border-radius: 10px;
             z-index: 1000;
             top: 100%;
@@ -180,14 +161,10 @@
         @media (max-width: 768px) {
             .admin-dropdown-content {
                 position: static;
-                width: 100%;
-                margin-top: 0.5rem;
             }
-            
             .admin-dropdown:hover .admin-dropdown-content {
                 display: none;
             }
-            
             .admin-dropdown.active .admin-dropdown-content {
                 display: block;
             }
@@ -197,21 +174,17 @@
             display: inline;
         }
         
-        .nav-logout, .logout-btn {
+        .nav-logout {
             background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
             cursor: pointer;
-            font-weight: 500;
-            transition: transform 0.2s;
         }
         
-        /* XP Bar - Mobile Responsive */
+        /* XP Bar - Mobile Friendly */
         .xp-bar-container {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 8px 12px;
+            padding: 8px 16px;
             border-bottom: 1px solid rgba(0, 229, 255, 0.2);
         }
         
@@ -243,16 +216,14 @@
             flex: 1;
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
-            height: 8px;
-            overflow: hidden;
-            min-width: 100px;
+            height: 6px;
+            min-width: 120px;
         }
         
         .xp-bar-fill {
             background: linear-gradient(90deg, #00e5ff, #b026ff);
             border-radius: 10px;
             height: 100%;
-            transition: width 0.3s ease;
         }
         
         .xp-next-level {
@@ -264,13 +235,11 @@
             .xp-bar-wrapper {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 8px;
+                gap: 6px;
             }
-            
             .xp-bar-info {
                 justify-content: space-between;
             }
-            
             .xp-next-level {
                 text-align: center;
             }
@@ -291,50 +260,102 @@
             padding: 12px 16px;
             border-radius: 10px;
             margin-bottom: 10px;
-            animation: slideIn 0.3s ease;
             font-size: 14px;
         }
         
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
+        .message.success { background: linear-gradient(135deg, #28a745, #20c997); }
+        .message.error { background: linear-gradient(135deg, #dc3545, #c82333); }
+        
+        /* Page Content */
+        .page {
+            min-height: calc(100vh - 200px);
+            padding: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .page {
+                padding: 24px;
             }
         }
         
-        /* Footer - Mobile Responsive */
+        /* Grids - Mobile Responsive */
+        .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        @media (min-width: 640px) {
+            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            padding: 30px 16px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 1.6rem;
+        }
+        
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            .hero-stats {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        /* Cards */
+        .learning-path-card, .language-card, .quiz-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 16px;
+            transition: 0.3s;
+        }
+        
+        /* Footer */
         .site-footer {
             background: linear-gradient(135deg, #0a0a2a, #0f0f23);
-            color: white;
-            padding: 30px 15px 20px;
+            padding: 30px 16px 20px;
             margin-top: 40px;
             border-top: 1px solid rgba(0, 229, 255, 0.2);
         }
         
         .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 25px;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            text-align: center;
         }
         
-        @media (max-width: 768px) {
+        @media (min-width: 768px) {
             .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-                gap: 20px;
+                grid-template-columns: repeat(4, 1fr);
+                text-align: left;
             }
         }
         
         .footer-section h4 {
             color: #00e5ff;
             margin-bottom: 12px;
-            font-size: 1rem;
         }
         
         .footer-section a {
@@ -342,7 +363,6 @@
             text-decoration: none;
             display: block;
             margin-bottom: 6px;
-            transition: color 0.3s;
             font-size: 13px;
         }
         
@@ -352,81 +372,6 @@
             margin-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
             font-size: 12px;
-            color: #9ca3af;
-        }
-        
-        /* Page Content - Mobile Padding */
-        .page {
-            min-height: calc(100vh - 200px);
-            padding: 15px;
-        }
-        
-        @media (min-width: 768px) {
-            .page {
-                padding: 20px;
-            }
-        }
-        
-        /* Grid Layouts - Mobile Responsive */
-        .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        
-        @media (max-width: 640px) {
-            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-        }
-        
-        /* Hero Section - Mobile */
-        .hero-section {
-            padding: 30px 15px;
-            text-align: center;
-        }
-        
-        .hero-title {
-            font-size: 1.8rem;
-        }
-        
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 1.5rem;
-            }
-            
-            .hero-description {
-                font-size: 0.9rem;
-            }
-            
-            .hero-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-        }
-        
-        /* Cards */
-        .learning-path-card, .language-card, .quiz-card {
-            padding: 15px;
-        }
-        
-        /* Buttons */
-        button, .btn, input[type="submit"] {
-            padding: 10px 18px;
-            font-size: 13px;
-        }
-        
-        /* Forms */
-        input, select, textarea {
-            font-size: 16px; /* Prevents zoom on mobile */
-        }
-        
-        /* Tables - Horizontal Scroll */
-        .table-responsive {
-            overflow-x: auto;
-            display: block;
-            width: 100%;
         }
         
         /* Loading Screen */
@@ -453,17 +398,11 @@
             animation: spin 1s linear infinite;
         }
         
-        .loader-text {
-            margin-top: 15px;
-            font-size: 1.2rem;
-            font-family: 'Orbitron', monospace;
-        }
-        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        /* Floating Buttons Mobile */
+        /* Floating Button */
         .floating-add-btn {
             position: fixed;
             bottom: 20px;
@@ -471,15 +410,15 @@
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
             cursor: pointer;
             z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 24px;
         }
         
         .galaxy {
@@ -493,45 +432,40 @@
             background: radial-gradient(ellipse at center, #0a0a2a 0%, #000000 100%);
         }
         
-        /* Sound toggles mobile */
-        .sound-toggle, .particles-toggle {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Buttons */
+        button, .btn, input[type="submit"] {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
             cursor: pointer;
-            z-index: 1000;
-            font-size: 16px;
+            font-weight: 600;
         }
         
-        .particles-toggle {
-            left: 65px;
+        /* Forms - Prevent zoom on mobile */
+        input, select, textarea {
+            font-size: 16px;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Mobile Menu Toggle Script -->
     <script>
         function toggleMobileMenu() {
-            const navLinks = document.querySelector('.nav-links');
-            navLinks.classList.toggle('show');
+            document.querySelector('.nav-links').classList.toggle('show');
         }
         
         function toggleAdminDropdown() {
-            const dropdown = document.querySelector('.admin-dropdown');
-            dropdown.classList.toggle('active');
+            document.querySelector('.admin-dropdown').classList.toggle('active');
         }
         
         document.addEventListener('DOMContentLoaded', function() {
-            // Close menu when clicking outside
             document.addEventListener('click', function(event) {
                 const navLinks = document.querySelector('.nav-links');
                 const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -541,41 +475,17 @@
                     }
                 }
             });
-            
-            if (typeof hljs !== 'undefined') hljs.highlightAll();
         });
-        
-        // Fix back/forward navigation
-        (function() {
-            let pageReloaded = false;
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted && !pageReloaded) {
-                    pageReloaded = true;
-                    window.location.reload();
-                }
-            });
-            if (window.performance) {
-                try {
-                    const navEntries = performance.getEntriesByType('navigation');
-                    if (navEntries.length > 0 && navEntries[0].type === 'back_forward') {
-                        window.location.reload();
-                    }
-                } catch(e) {}
-            }
-        })();
     </script>
     
-    <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader-spinner"></div>
         <div class="loader-text">🚀 Launching CodeQuest...</div>
-        <div class="loader-subtitle">Preparing your learning adventure</div>
     </div>
     
-    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-brand">
-            <a href="{% url 'home' %}">🚀 CodeQuest</a>
+            <a href="{% url 'home' %}">CodeQuest</a>
         </div>
         
         <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
@@ -617,7 +527,6 @@
         </div>
     </nav>
     
-    <!-- XP Bar (shown when logged in) -->
     {% if user.is_authenticated %}
     <div class="xp-bar-container">
         <div class="xp-bar-wrapper">
@@ -633,7 +542,6 @@
     </div>
     {% endif %}
     
-    <!-- Messages -->
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
@@ -644,41 +552,36 @@
     </div>
     {% endif %}
     
-    <!-- Main Content -->
     <main class="page">
         {% block content %}
         <div style="text-align: center; padding: 50px;">
-            <h1 style="color: white;">Welcome to CodeQuest!</h1>
-            <p style="color: #d1d5db;">Start your coding journey today.</p>
+            <h1>Welcome to CodeQuest!</h1>
+            <p>Start your coding journey today.</p>
         </div>
         {% endblock %}
     </main>
     
-    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h4>🚀 CodeQuest</h4>
+                <h4>CodeQuest</h4>
                 <p>Learn programming through gamified space adventures</p>
             </div>
             <div class="footer-section">
                 <h4>📚 Quick Links</h4>
-                <a href="{% url 'learning_paths' %}">📚 Learning Paths</a>
-                <a href="{% url 'leaderboard' %}">🏆 Leaderboard</a>
-                <a href="{% url 'dashboard' %}">📊 Dashboard</a>
-                {% if not user.is_authenticated %}
-                    <a href="{% url 'register' %}">✨ Sign Up</a>
-                {% endif %}
+                <a href="{% url 'learning_paths' %}">Learning Paths</a>
+                <a href="{% url 'leaderboard' %}">Leaderboard</a>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
             </div>
             <div class="footer-section">
                 <h4>💻 Languages</h4>
-                <a href="{% url 'learning_paths' %}?language=1">🐍 Python</a>
-                <a href="{% url 'learning_paths' %}?language=2">📜 JavaScript</a>
+                <a href="{% url 'learning_paths' %}?language=1">Python</a>
+                <a href="{% url 'learning_paths' %}?language=2">JavaScript</a>
             </div>
             <div class="footer-section">
                 <h4>🌌 Connect</h4>
-                <a href="#">💬 Discord</a>
-                <a href="#">🐙 GitHub</a>
+                <a href="#">Discord</a>
+                <a href="#">GitHub</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -688,22 +591,19 @@
     
     <div class="galaxy"></div>
     
-    <script src="{% static 'js/main.js' %}?v=3"></script>
-    {% block extra_js %}{% endblock %}
-    
     <script>
-        // Hide loading screen
         window.addEventListener('load', function() {
             setTimeout(function() {
                 const loadingScreen = document.getElementById('loadingScreen');
                 if (loadingScreen) {
                     loadingScreen.style.opacity = '0';
-                    setTimeout(function() { 
-                        loadingScreen.style.display = 'none'; 
-                    }, 500);
+                    setTimeout(function() { loadingScreen.style.display = 'none'; }, 500);
                 }
             }, 800);
         });
     </script>
+    
+    <script src="{% static 'js/main.js' %}?v=4"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
