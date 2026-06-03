@@ -1,0 +1,27 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Code Practice - {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="code-practice-container" style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 80vh;">
+        
+        <!-- Code Editor -->
+        <div style="background: #1a1a3a; border-radius: 15px; overflow: hidden;">
+            <div style="background: #2d2d4a; padding: 10px 15px;">
+                <span style="color: #00e5ff;">✏️ Code Editor</span>
+                <select id="languageSelect" style="float: right; background: #0f0f23; color: white; border: 1px solid #00e5ff; padding: 5px; border-radius: 5px;">
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="javascript">JavaScript</option>
+                </select>
+            </div>
+            <textarea id="codeEditor" style="width: 100%; height: calc(100% - 50px); background: #0f0f23; color: #00e5ff; border: none; padding: 20px; font-family: monospace; font-size: 14px; resize: none;" placeholder="Write your code here..."></textarea>
+        </div>
+        
+        <!-- Output Panel -->
+        <div style="background: #1a1a3a; border-radius: 15px; overflow: hidden;">
+            <div style="background: #2d2d4a; padding: 10px 15px;">
+                <span style="color: #ffd93d;">📤 Output</span>
+                <button onclick="runCode()" style="float: right; background: linear-gradient(135deg, #b026ff, #00e5ff); border: none; padding: 5px 15px; border-radius: 5px; color:z

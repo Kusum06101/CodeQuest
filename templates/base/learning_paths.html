@@ -1,0 +1,84 @@
+<!-- templates/base/learning_paths.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Learning Paths - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="learning-paths-container">
+    <div class="page-header">
+        <h1>🚀 Choose Your Learning Adventure</h1>
+        <p>Select a path and start your coding journey through the galaxy!</p>
+    </div>
+    
+    <!-- Filters Bar -->
+    <div class="filters-bar">
+        <form method="get" class="filters-form">
+            <input type="text" name="q" placeholder="🔍 Search paths..." value="{{ search_query }}" class="search-input">
+            
+            <select name="language" class="filter-select">
+                <option value="">🌌 All Languages</option>
+                {% for lang in languages %}
+                <option value="{{ lang.id }}" {% if active_filters.language == lang.id|stringformat:"s" %}selected{% endif %}>
+                    💻 {{ lang.name }}
+                </option>
+                {% endfor %}
+            </select>
+            
+            <select name="difficulty" class="filter-select">
+                <option value="">🎯 All Difficulties</option>
+                <option value="BEGINNER" {% if active_filters.difficulty == 'BEGINNER' %}selected{% endif %}>🌱 Beginner</option>
+                <option value="INTERMEDIATE" {% if active_filters.difficulty == 'INTERMEDIATE' %}selected{% endif %}>⭐ Intermediate</option>
+                <option value="ADVANCED" {% if active_filters.difficulty == 'ADVANCED' %}selected{% endif %}>🚀 Advanced</option>
+            </select>
+            
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+        </form>
+    </div>
+    
+    <!-- Learning Paths Grid -->
+    <div class="learning-paths-grid">
+        {% for path in learning_paths %}
+        <div class="learning-path-card" onclick="location.href='{% url 'learning_path_detail' path.slug %}'">
+            <div class="difficulty-badge {{ path.difficulty|lower }}">
+                {% if path.difficulty == 'BEGINNER' %}🌱 Beginner
+                {% elif path.difficulty == 'INTERMEDIATE' %}⭐ Intermediate
+                {% else %}🚀 Advanced{% endif %}
+            </div>
+            <h3 class="path-title">{{ path.title }}</h3>
+            <p class="path-description">{{ path.description|truncatewords:25 }}</p>
+            <div class="path-stats">
+                <span>💻 {{ path.language.name }}</span>
+                <span>⏱️ {{ path.estimated_hours }} hours</span>
+                <span>📚 {{ path.lessons.count }} lessons</span>
+                <span>🎯 {{ path.get_difficulty_display }}</span>
+            </div>
+            <div class="path-footer">
+                <a href="{% url 'learning_path_detail' path.slug %}" class="start-learning-btn">
+                    Start Journey <span class="rocket">🚀</span>
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-results">
+            <p>🌌 No learning paths found. Check back soon for new adventures!</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_filters.language %}&language={{ active_filters.language }}{% endif %}{% if active_filters.difficulty %}&difficulty={{ active_filters.difficulty }}{% endif %}" class="page-link">← Previous</a>
+        {% endif %}
+        
+        <span class="current-page">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if active_filters.language %}&language={{ active_filters.language }}{% endif %}{% if active_filters.difficulty %}&difficulty={{ active_filters.difficulty }}{% endif %}" class="page-link">Next →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

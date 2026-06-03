@@ -1,0 +1,25 @@
+<nav class="navbar">
+    <div class="nav-brand">
+        <a href="{% url 'home' %}">Code Quest</a>
+    </div>
+
+    <div class="nav-links">
+        {% if user.is_authenticated %}
+            <a href="{% url 'programming-language-list' %}">Languages</a>
+            <a href="/learn/">Learning Paths</a>
+            <a href="{% url 'challenge-list' %}">Challenges</a>
+            <a href="{% url 'quiz-list' %}">Quizzes</a>
+            <a href="{% url 'badge-list' %}">Badges</a>
+            <a href="{% url 'leaderboard-entry-list' %}">Leaderboard</a>
+            <a href="{% url 'notification-list' %}">Notifications</a>
+
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="nav-logout">Logout</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </div>
+</nav>

@@ -1,0 +1,392 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ challenge.title }} - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="challenge-detail-container">
+    <!-- Navigation -->
+    <div class="challenge-nav">
+        <a href="{% url 'challenges' %}" class="back-link">← Back to Challenges</a>
+    </div>
+
+    <!-- Challenge Header -->
+    <div class="challenge-header">
+        <div class="challenge-badges">
+            <span class="difficulty-badge {{ challenge.difficulty|lower }}">
+                {{ challenge.get_difficulty_display }}
+            </span>
+            <span class="challenge-type-badge">
+                {{ challenge.get_challenge_type_display }}
+            </span>
+        </div>
+        <h1>{{ challenge.title }}</h1>
+        <div class="challenge-meta">
+            <span>💻 Language: {{ challenge.language.name }}</span>
+            <span>⭐ Reward: {{ challenge.xp_reward }} XP</span>
+            <span>⏱️ Time Limit: {{ challenge.time_limit_seconds }} seconds</span>
+            <span>💾 Memory Limit: {{ challenge.memory_limit_mb }} MB</span>
+        </div>
+    </div>
+
+    <!-- Problem Statement -->
+    <div class="challenge-section">
+        <h2>📖 Problem Statement</h2>
+        <div class="problem-statement">
+            {{ challenge.problem_statement|safe }}
+        </div>
+    </div>
+
+    <!-- Constraints -->
+    {% if challenge.constraints_text %}
+    <div class="challenge-section">
+        <h2>⚠️ Constraints</h2>
+        <div class="constraints">
+            {{ challenge.constraints_text|safe }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Input/Output Format -->
+    <div class="challenge-section">
+        <h2>📝 Input & Output</h2>
+        <div class="io-section">
+            <div class="input-format">
+                <h3>Input Format</h3>
+                <p>The input format is described in the problem statement above.</p>
+            </div>
+            <div class="output-format">
+                <h3>Output Format</h3>
+                <p>Your output should match the expected output format described above.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sample Test Cases -->
+    {% if challenge.test_cases %}
+    <div class="challenge-section">
+        <h2>🧪 Sample Test Cases</h2>
+        <div class="test-cases">
+            {% for test_case in challenge.test_cases|slice:":2" %}
+            <div class="test-case">
+                <div class="test-input">
+                    <strong>Input:</strong>
+                    <pre>{{ test_case.input }}</pre>
+                </div>
+                <div class="test-output">
+                    <strong>Expected Output:</strong>
+                    <pre>{{ test_case.expected }}</pre>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Starter Code -->
+    {% if challenge.starter_code %}
+    <div class="challenge-section">
+        <h2>💻 Starter Code</h2>
+        <div class="code-block">
+            <button class="copy-btn" onclick="copyCode(this)">📋 Copy</button>
+            <pre><code class="language-{{ challenge.language.name|lower }}">{{ challenge.starter_code }}</code></pre>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Submission Form -->
+    <div class="challenge-section">
+        <h2>✍️ Your Solution</h2>
+        <form method="post" action="{% url 'submit_challenge' challenge.id %}" class="submission-form">
+            {% csrf_token %}
+            <textarea name="code" id="code-editor" rows="15" placeholder="Write your solution here...">{{ user_submission.submitted_code|default:challenge.starter_code }}</textarea>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">🚀 Submit Solution</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Previous Submissions -->
+    {% if user_submission %}
+    <div class="challenge-section">
+        <h2>📊 Your Previous Submission</h2>
+        <div class="submission-status">
+            <div class="status-badge {{ user_submission.status|lower }}">
+                Status: {{ user_submission.get_status_display }}
+            </div>
+            <div class="submission-details">
+                <span>Score: {{ user_submission.score }}%</span>
+                <span>Passed: {{ user_submission.passed_test_cases }}/{{ user_submission.total_test_cases }} tests</span>
+                <span>Time: {{ user_submission.execution_time_ms }}ms</span>
+                <span>Memory: {{ user_submission.memory_used_kb }}KB</span>
+            </div>
+            {% if user_submission.error_message %}
+            <div class="error-message">
+                <strong>Error:</strong> {{ user_submission.error_message }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.challenge-detail-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.challenge-nav {
+    margin-bottom: 20px;
+}
+
+.back-link {
+    color: #00e5ff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.challenge-header {
+    background: linear-gradient(135deg, rgba(176, 38, 255, 0.15), rgba(0, 229, 255, 0.15));
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.challenge-badges {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.challenge-type-badge {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.challenge-meta {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.challenge-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 25px;
+}
+
+.challenge-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    color: #00e5ff;
+}
+
+.problem-statement {
+    line-height: 1.7;
+}
+
+.problem-statement p {
+    margin-bottom: 15px;
+}
+
+.problem-statement pre {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 15px 0;
+}
+
+.io-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.io-section h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.test-cases {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.test-case {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.test-input pre, .test-output pre {
+    background: #0f172a;
+    padding: 10px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.code-block {
+    position: relative;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+    z-index: 10;
+}
+
+.copy-btn:hover {
+    background: #00e5ff;
+    color: black;
+}
+
+.submission-form textarea {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    padding: 15px;
+    resize: vertical;
+}
+
+.submission-form textarea:focus {
+    outline: none;
+    border-color: #00e5ff;
+}
+
+.form-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.submission-status {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.status-badge.accepted {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid #22c55e;
+}
+
+.status-badge.wrong_answer {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid #ef4444;
+}
+
+.status-badge.time_limit_exceeded {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+    border: 1px solid #f59e0b;
+}
+
+.submission-details {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.error-message {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    color: #f87171;
+    font-size: 13px;
+}
+
+.difficulty-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+.difficulty-badge.beginner {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid #22c55e;
+    color: #4ade80;
+}
+
+.difficulty-badge.intermediate {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid #f59e0b;
+    color: #fbbf24;
+}
+
+.difficulty-badge.advanced {
+    background: rgba(176, 38, 255, 0.15);
+    border: 1px solid #b026ff;
+    color: #ff4fd8;
+}
+
+@media (max-width: 768px) {
+    .challenge-header {
+        padding: 20px;
+    }
+    
+    .io-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .challenge-meta {
+        gap: 10px;
+    }
+    
+    .submission-details {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+</style>
+
+<script>
+function copyCode(button) {
+    const codeBlock = button.parentElement.querySelector('code');
+    const text = codeBlock.innerText;
+    navigator.clipboard.writeText(text);
+    button.textContent = '✓ Copied!';
+    setTimeout(() => {
+        button.textContent = '📋 Copy';
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+<aside class="sidebar">
+    <div class="sidebar-section">
+        <h3>Your Progress</h3>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ completion_percentage|default:0 }}%"></div>
+            <p class="progress-text">{{ completed_lessons|default:0 }}/{{ total_lessons|default:0 }} lessons completed</p>
+        </div>
+    </div>
+    
+    <div class="sidebar-section">
+        <h3>🏆 Achievements</h3>
+        <div class="achievements-list">
+            {% for badge in user.badges.all|slice:":5" %}
+            <div class="achievement">
+                <span class="achievement-icon">🏅</span>
+                <span class="achievement-name">{{ badge.badge.name }}</span>
+            </div>
+            {% empty %}
+            <p class="muted">Complete lessons to earn badges!</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="sidebar-section">
+        <h3>🔥 Current Streak</h3>
+        <div class="streak-display">
+            <span class="streak-count">{{ user.profile.streak_count|default:0 }}</span>
+            <span class="streak-label">days</span>
+        </div>
+    </div>
+    
+    <div class="sidebar-section">
+        <h3>Recommended</h3>
+        <ul class="recommended-list">
+            <li><a href="#">Python Basics</a></li>
+            <li><a href="#">JavaScript Functions</a></li>
+            <li><a href="#">HTML Fundamentals</a></li>
+        </ul>
+    </div>
+</aside>

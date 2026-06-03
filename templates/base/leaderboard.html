@@ -1,0 +1,127 @@
+<!-- templates/base/leaderboard.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Galactic Leaderboard - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <div class="page-header">
+        <h1>🏆 Galactic Leaderboard</h1>
+        <p>Top astronauts ranked by total XP earned through space missions</p>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('all-time')">🌌 All Time</button>
+        <button class="tab" onclick="showTab('weekly')">📅 Weekly</button>
+        <button class="tab" onclick="showTab('paths')">🎯 By Mission</button>
+    </div>
+    
+    <!-- All Time Leaderboard -->
+    <div id="all-time" class="tab-content active">
+        <div class="leaderboard-table">
+            <div class="leaderboard-header-row">
+                <div class="rank">Rank</div>
+                <div class="user">Astronaut</div>
+                <div class="level">Level</div>
+                <div class="xp">Total XP</div>
+                <div class="badges">Badges</div>
+            </div>
+            {% for top_user in top_users %}
+            <div class="leaderboard-row {% if top_user == user %}current-user{% endif %}">
+                <div class="rank">
+                    {% if forloop.counter == 1 %}👑
+                    {% elif forloop.counter == 2 %}🥈
+                    {% elif forloop.counter == 3 %}🥉
+                    {% else %}#{{ forloop.counter }}{% endif %}
+                </div>
+                <div class="user">
+                    <strong>{{ top_user.get_full_name|default:top_user.username }}</strong>
+                    <small>@{{ top_user.username }}</small>
+                </div>
+                <div class="level">Lvl {{ top_user.current_level }}</div>
+                <div class="xp">{{ top_user.total_xp }} XP</div>
+                <div class="badges">{{ top_user.badges.count }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Weekly Leaderboard -->
+    <div id="weekly" class="tab-content" style="display: none;">
+        <div class="leaderboard-table">
+            <div class="leaderboard-header-row">
+                <div class="rank">Rank</div>
+                <div class="user">Astronaut</div>
+                <div class="xp">Weekly XP</div>
+            </div>
+            {% for user in weekly_top %}
+            <div class="leaderboard-row">
+                <div class="rank">#{{ forloop.counter }}</div>
+                <div class="user">{{ user.username }}</div>
+                <div class="xp">{{ user.weekly_xp|default:0 }} XP</div>
+            </div>
+            {% empty %}
+            <div class="leaderboard-row">
+                <div colspan="3" class="text-center">No weekly activity yet! Start your missions!</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Path Leaderboards -->
+    <div id="paths" class="tab-content" style="display: none;">
+        {% for leaderboard in path_leaderboards %}
+        <div class="path-leaderboard">
+            <h3>{{ leaderboard.path.title }}</h3>
+            <div class="leaderboard-table">
+                {% for learner in leaderboard.top_learners %}
+                <div class="leaderboard-row">
+                    <div class="rank">#{{ forloop.counter }}</div>
+                    <div class="user">{{ learner.username }}</div>
+                    <div class="progress">{{ learner.path_progress|floatformat:0 }}% Complete</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- User's Rank Card -->
+    {% if user_rank %}
+    <div class="user-rank-card">
+        <h3>Your Galactic Rank</h3>
+        <div class="rank-display">
+            <span class="rank-number">#{{ user_rank }}</span>
+            <span class="rank-label">out of {{ top_users|length }} astronauts</span>
+        </div>
+        <p>Keep completing missions to climb the ranks!</p>
+        <div class="xp-to-next">
+            {% with next_user=top_users|slice:":1"|first %}
+                {% if next_user and next_user != user %}
+                    <span>{{ user.total_xp }} XP</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <span>{{ next_user.total_xp }} XP to reach #{{ user_rank|add:"-1" }}</span>
+                {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(tabId).style.display = 'block';
+    event.target.classList.add('active');
+}
+</script>
+{% endblock %}

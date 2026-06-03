@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>{{ page_title }}</h1>
+    <a class="btn btn-light" href="{% url list_url_name %}">Back</a>
+</section>
+
+<form method="post" class="card">
+    {% csrf_token %}
+
+    <p>
+        Are you sure you want to delete?
+        <strong>{{ object }}</strong>
+    </p>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a class="btn btn-light" href="{% url list_url_name %}">Cancel</a>
+    </div>
+</form>
+{% endblock %}

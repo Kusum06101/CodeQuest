@@ -1,0 +1,338 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ path.title }} - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="learning-path-container">
+    <!-- Back Button -->
+    <div class="path-nav">
+        <a href="{% url 'learning_paths' %}" class="back-link">← Back to Learning Paths</a>
+    </div>
+
+    <!-- Path Header -->
+    <div class="path-header">
+        <h1>{{ path.title }}</h1>
+        <p class="path-description">{{ path.description }}</p>
+        <div class="path-meta">
+            <span class="meta-item">💻 {{ path.language.name }}</span>
+            <span class="meta-item difficulty-{{ path.difficulty|lower }}">{{ path.get_difficulty_display }}</span>
+            <span class="meta-item">⏱️ {{ path.estimated_hours }} hours</span>
+            <span class="meta-item">📚 {{ total_lessons }} lessons</span>
+        </div>
+    </div>
+
+    <!-- Progress Section -->
+    {% if user.is_authenticated and progress %}
+    <div class="progress-section">
+        <div class="progress-header">
+            <span>Your Progress</span>
+            <span>{{ progress.progress_percent }}% Complete</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: {{ progress.progress_percent }}%"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lessons List -->
+    <div class="lessons-section">
+        <h2>📖 Course Lessons</h2>
+        
+        {% for lesson in lessons %}
+        <!-- Add this for debugging -->
+{% if not lessons %}
+<div class="empty-state" style="background: rgba(255,0,0,0.1); border: 2px solid red;">
+    <p style="color: red;">⚠️ DEBUG: No lessons found for this course!</p>
+    <p style="color: yellow; font-size: 12px;">Course ID: {{ path.id }}</p>
+    <p style="color: yellow; font-size: 12px;">Course Slug: {{ path.slug }}</p>
+    <p style="color: yellow; font-size: 12px;">Make sure lessons are added to this learning path in admin panel.</p>
+</div>
+{% endif %}
+        <div class="lesson-card {% if lesson.id in completed_lesson_ids %}completed{% endif %}">
+            <div class="lesson-number">{{ forloop.counter }}</div>
+            <div class="lesson-info">
+                <h3>{{ lesson.title }}</h3>
+                <div class="lesson-meta">
+                    <span class="xp-reward">🎯 {{ lesson.xp_reward }} XP</span>
+                    {% if lesson.id in completed_lesson_ids %}
+                        <span class="completed-badge">✅ Completed</span>
+                    {% elif lesson.is_locked %}
+                        <span class="locked-badge">🔒 Locked</span>
+                    {% endif %}
+                </div>
+                <p class="lesson-preview">{{ lesson.theory_content|striptags|truncatewords:20|default:"Click to start learning!" }}</p>
+            </div>
+            <div class="lesson-action">
+                {% if lesson.id in completed_lesson_ids %}
+                    <a href="{% url 'lesson_detail' path.slug lesson.slug %}" class="btn-review">Review →</a>
+                {% elif lesson.is_locked %}
+                    <span class="btn-locked">🔒 Complete previous lesson</span>
+                {% else %}
+                    <a href="{% url 'lesson_detail' path.slug lesson.slug %}" class="btn-start">Start Lesson →</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>No lessons available yet. Check back soon!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.learning-path-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.path-nav {
+    margin-bottom: 20px;
+}
+
+.back-link {
+    color: #00e5ff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+.path-header {
+    background: linear-gradient(135deg, rgba(176,38,255,0.15), rgba(0,229,255,0.15));
+    border-radius: 24px;
+    padding: 30px;
+    margin-bottom: 30px;
+}
+
+.path-header h1 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.path-description {
+    color: #d1d5db;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.path-meta {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    font-size: 13px;
+    color: white;
+}
+
+.difficulty-beginner {
+    background: rgba(34,197,94,0.2);
+    color: #4ade80;
+}
+
+.difficulty-intermediate {
+    background: rgba(245,158,11,0.2);
+    color: #fbbf24;
+}
+
+.difficulty-advanced {
+    background: rgba(176,38,255,0.2);
+    color: #c084fc;
+}
+
+.progress-section {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 30px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: white;
+}
+
+.progress-bar-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background: linear-gradient(90deg, #00e5ff, #b026ff);
+    border-radius: 10px;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.lessons-section h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.lesson-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: 0.3s;
+}
+
+.lesson-card:hover {
+    transform: translateX(5px);
+    border-color: #00e5ff;
+}
+
+.lesson-card.completed {
+    border-color: #4ade80;
+    background: rgba(74,222,128,0.05);
+}
+
+.lesson-number {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #b026ff, #00e5ff);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    flex-shrink: 0;
+    color: white;
+}
+
+.lesson-card.completed .lesson-number {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.lesson-info {
+    flex: 1;
+}
+
+.lesson-info h3 {
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.lesson-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.xp-reward {
+    color: #ffd93d;
+}
+
+.completed-badge {
+    color: #4ade80;
+}
+
+.locked-badge {
+    color: #9ca3af;
+}
+
+.lesson-preview {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.lesson-action {
+    flex-shrink: 0;
+}
+
+.btn-start, .btn-review {
+    background: linear-gradient(135deg, #b026ff, #00e5ff);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 0.3s;
+    display: inline-block;
+}
+
+.btn-start:hover, .btn-review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,229,255,0.3);
+    color: white;
+}
+
+.btn-review {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.btn-locked {
+    background: rgba(255,255,255,0.1);
+    color: #9ca3af;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    cursor: not-allowed;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 20px;
+    color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+    .learning-path-container {
+        padding: 15px;
+    }
+    
+    .path-header {
+        padding: 20px;
+    }
+    
+    .path-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .lesson-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .lesson-meta {
+        justify-content: center;
+    }
+    
+    .lesson-action {
+        width: 100%;
+    }
+    
+    .btn-start, .btn-review, .btn-locked {
+        width: 100%;
+        text-align: center;
+        display: block;
+    }
+}
+</style>
+{% endblock %}

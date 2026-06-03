@@ -1,0 +1,35 @@
+<footer class="site-footer">
+    <div class="footer-content">
+        <div class="footer-section">
+            <h4>CodeQuest</h4>
+            <p>Learn programming through gamified experiences</p>
+            <p>Master coding with interactive lessons and real-time quizzes</p>
+        </div>
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <a href="{% url 'learning_paths' %}">📚 Learning Paths</a>
+            <a href="{% url 'leaderboard' %}">🏆 Leaderboard</a>
+            <a href="{% url 'dashboard' %}">📊 Dashboard</a>
+            {% if not user.is_authenticated %}
+                <a href="{% url 'register' %}">✨ Sign Up</a>
+            {% endif %}
+        </div>
+        <div class="footer-section">
+            <h4>Languages</h4>
+            <a href="#">Python</a>
+            <a href="#">JavaScript</a>
+            <a href="#">Java</a>
+            <a href="#">HTML/CSS</a>
+        </div>
+        <div class="footer-section">
+            <h4>Connect</h4>
+            <a href="#">💬 Discord Community</a>
+            <a href="#">🐙 GitHub</a>
+            <a href="#">🐦 Twitter</a>
+            <a href="#">📧 Contact Us</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 CodeQuest - Make Learning an Adventure! All rights reserved.</p>
+    </div>
+</footer>

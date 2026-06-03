@@ -1,0 +1,130 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Quizzes - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📝 Quizzes</h1>
+    <p>Test your knowledge with these space missions</p>
+</div>
+
+<div class="quizzes-grid">
+    {% for quiz in quizzes %}
+    <div class="quiz-card" onclick="location.href='{% url 'take_quiz' quiz.id %}'">
+        <div class="quiz-header">
+            <h3>{{ quiz.title }}</h3>
+            <div class="quiz-badge">📚 {{ quiz.lesson.title }}</div>
+        </div>
+        <div class="quiz-body">
+            <p>{{ quiz.lesson.theory_content|striptags|truncatewords:25 }}</p>
+        </div>
+        <div class="quiz-footer">
+            <div class="quiz-meta">
+                <span>⏱️ {{ quiz.time_limit_minutes }} minutes</span>
+                <span>⭐ {{ quiz.xp_reward }} XP</span>
+                <span>📝 {{ quiz.questions.count }} questions</span>
+            </div>
+            <a href="{% url 'take_quiz' quiz.id %}" class="btn btn-primary btn-small">Take Quiz →</a>
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-results">
+        <p>🌌 No quizzes available yet. Check back soon for new challenges!</p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.quizzes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.quiz-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 20px;
+    padding: 24px;
+    transition: 0.3s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.quiz-card:hover {
+    transform: translateY(-5px);
+    border-color: #00e5ff;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.3);
+}
+
+.quiz-header {
+    margin-bottom: 15px;
+}
+
+.quiz-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.quiz-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(0, 229, 255, 0.15);
+    border-radius: 20px;
+    font-size: 11px;
+    color: #00e5ff;
+}
+
+.quiz-body {
+    flex: 1;
+    margin-bottom: 15px;
+}
+
+.quiz-body p {
+    color: #d1d5db;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.quiz-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+}
+
+.quiz-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.quiz-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 13px;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    color: #9ca3af;
+    grid-column: 1 / -1;
+}
+</style>
+{% endblock %}

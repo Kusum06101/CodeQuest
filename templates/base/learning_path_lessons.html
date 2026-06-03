@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ learning_path.title }} - Lessons{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl p-8 mb-8 text-white">
+        <div class="flex justify-between items-start">
+            <div>
+                <h1 class="text-3xl font-bold mb-2">{{ learning_path.title }}</h1>
+                <p class="text-purple-100">{{ learning_path.description }}</p>
+                <div class="mt-4 flex gap-4">
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-sm">
+                        🎯 {{ learning_path.difficulty }}
+                    </span>
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-sm">
+                        📚 {{ total_lessons }} lessons
+                    </span>
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-sm">
+                        ⭐ {{ learning_path.estimated_hours }} hours
+                    </span>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm mb-1">Your Progress</div>
+                <div class="text-2xl font-bold">{{ progress_percent }}%</div>
+                <div class="w-32 h-2 bg-white/30 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full bg-green-400 rounded-full" style="width: {{ progress_percent }}%"></div>
+                </div>
+                <div class="text-xs mt-1">{{ completed_count }}/{{ total_lessons }} completed</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lessons List -->
+    <div class="space-y-4">
+        <h2 class="text-2xl font-bold mb-4">📖 Course Lessons</h2>
+        
+        {% for lesson in lessons %}
+        <div class="bg-gray-800 rounded-xl p-5 hover:bg-gray-750 transition-all duration-200 
+                    {% if lesson.id in completed_lesson_ids %}border-l-4 border-green-500{% endif %}">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-2xl">
+                            {% if lesson.id in completed_lesson_ids %}
+                            ✅
+                            {% else %}
+                            📘
+                            {% endif %}
+                        </span>
+                        <h3 class="text-xl font-semibold">
+                            {{ lesson.order }}. {{ lesson.title }}
+                        </h3>
+                        <span class="bg-yellow-500/20 text-yellow-300 px-2 py-1 rounded text-xs">
+                            🎯 {{ lesson.xp_reward }} XP
+                        </span>
+                    </div>
+                    
+                    {% if lesson.learning_objectives %}
+                    <p class="text-gray-400 text-sm mb-3">{{ lesson.learning_objectives|truncatewords:30 }}</p>
+                    {% endif %}
+                    
+                    <div class="flex gap-3 text-sm text-gray-500">
+                        {% if lesson.quizzes.exists %}
+                        <span>📝 Quiz available</span>
+                        {% endif %}
+                        {% if lesson.challenges.exists %}
+                        <span>💻 Challenges available</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="ml-4">
+                    {% if lesson.id in completed_lesson_ids %}
+                        <span class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">
+                            Completed ✓
+                        </span>
+                    {% else %}
+                        <a href="{% url 'lesson_detail' learning_path.slug lesson.slug %}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors">
+                            Start Lesson →
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="bg-gray-800 rounded-xl p-12 text-center">
+            <p class="text-gray-400 text-lg">No lessons available for this course yet.</p>
+            <p class="text-gray-500 mt-2">Check back later for new content!</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Back button -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'learning_path_detail' learning_path.slug %}" 
+           class="text-purple-400 hover:text-purple-300">
+            ← Back to Course Overview
+        </a>
+    </div>
+</div>
+{% endblock %}

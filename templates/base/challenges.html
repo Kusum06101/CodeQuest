@@ -1,0 +1,93 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Coding Challenges - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>💻 Coding Challenges</h1>
+    <p>Test your skills with these space missions</p>
+</div>
+
+<div class="challenges-grid">
+    {% for challenge in challenges %}
+    <div class="challenge-card">
+        <div class="difficulty-badge {{ challenge.difficulty|lower }}">
+            {{ challenge.get_difficulty_display }}
+        </div>
+        <h3>{{ challenge.title }}</h3>
+        <p>{{ challenge.problem_statement|striptags|truncatewords:20 }}</p>
+        <div class="challenge-meta">
+            <span>💻 {{ challenge.language.name }}</span>
+            <span>⭐ {{ challenge.xp_reward }} XP</span>
+        </div>
+        <a href="{% url 'challenge_detail' challenge.id %}" class="btn btn-primary btn-small">Start Challenge →</a>
+    </div>
+    {% empty %}
+    <div class="no-results">
+        <p>🌌 No challenges available yet. Check back soon!</p>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.challenges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+.challenge-card {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 20px;
+    padding: 24px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+.challenge-card:hover {
+    transform: translateY(-5px);
+    border-color: #00e5ff;
+    box-shadow: 0 0 20px rgba(0,229,255,0.3);
+}
+.challenge-meta {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+    color: #9ca3af;
+    font-size: 13px;
+}
+.difficulty-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.difficulty-badge.beginner {
+    background: rgba(34,197,94,0.15);
+    border: 1px solid #22c55e;
+    color: #4ade80;
+}
+.difficulty-badge.intermediate {
+    background: rgba(245,158,11,0.15);
+    border: 1px solid #f59e0b;
+    color: #fbbf24;
+}
+.difficulty-badge.advanced {
+    background: rgba(176,38,255,0.15);
+    border: 1px solid #b026ff;
+    color: #ff4fd8;
+}
+.no-results {
+    text-align: center;
+    padding: 60px;
+    color: #9ca3af;
+}
+.btn-small {
+    padding: 8px 16px;
+    font-size: 13px;
+}
+</style>
+{% endblock %}

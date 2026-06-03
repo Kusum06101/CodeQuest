@@ -1,0 +1,118 @@
+<!-- templates/base/search_results.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Search Results - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="page-header">
+        <h1>🔍 Search the Galaxy</h1>
+        <p>Find missions, challenges, and learning paths</p>
+    </div>
+    
+    <div class="search-section">
+        <form method="get" action="{% url 'search' %}" class="search-form">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search for missions, challenges, or paths..." class="search-input">
+            <button type="submit" class="btn btn-primary">Search Galaxy</button>
+        </form>
+    </div>
+    
+    {% if query %}
+        <div class="search-stats">
+            <p>🔭 Found {{ total_results }} results for "{{ query }}"</p>
+        </div>
+        
+        <div class="search-tabs">
+            <button class="tab active" onclick="showCategory('lessons')">📚 Lessons ({{ lessons|length }})</button>
+            <button class="tab" onclick="showCategory('challenges')">💻 Challenges ({{ challenges|length }})</button>
+            <button class="tab" onclick="showCategory('paths')">🎯 Learning Paths ({{ learning_paths|length }})</button>
+        </div>
+        
+        <!-- Lessons Results -->
+        <div id="lessons" class="category-content">
+            {% for lesson in lessons %}
+            <div class="search-result-card" onclick="location.href='{% url 'lesson_detail' lesson.learning_path.slug lesson.slug %}'">
+                <div class="result-icon">📚</div>
+                <div class="result-content">
+                    <h3>{{ lesson.title }}</h3>
+                    <p>{{ lesson.theory_content|striptags|truncatewords:30 }}</p>
+                    <div class="result-meta">
+                        <span>🎯 Path: {{ lesson.learning_path.title }}</span>
+                        <span>⭐ {{ lesson.xp_reward }} XP</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-results">
+                <p>🌌 No lessons found for "{{ query }}"</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Challenges Results -->
+        <div id="challenges" class="category-content" style="display: none;">
+            {% for challenge in challenges %}
+            <div class="search-result-card">
+                <div class="result-icon">💻</div>
+                <div class="result-content">
+                    <h3>{{ challenge.title }}</h3>
+                    <p>{{ challenge.problem_statement|striptags|truncatewords:30 }}</p>
+                    <div class="result-meta">
+                        <span>🌍 Language: {{ challenge.language.name }}</span>
+                        <span>🎯 Difficulty: {{ challenge.get_difficulty_display }}</span>
+                        <span>⭐ {{ challenge.xp_reward }} XP</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-results">
+                <p>🌌 No challenges found for "{{ query }}"</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Learning Paths Results -->
+        <div id="paths" class="category-content" style="display: none;">
+            {% for path in learning_paths %}
+            <div class="search-result-card" onclick="location.href='{% url 'learning_path_detail' path.slug %}'">
+                <div class="result-icon">🎯</div>
+                <div class="result-content">
+                    <h3>{{ path.title }}</h3>
+                    <p>{{ path.description|truncatewords:30 }}</p>
+                    <div class="result-meta">
+                        <span>💻 {{ path.language.name }}</span>
+                        <span>🎯 {{ path.get_difficulty_display }}</span>
+                        <span>⏱️ {{ path.estimated_hours }} hours</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-results">
+                <p>🌌 No learning paths found for "{{ query }}"</p>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="search-prompt">
+            <div class="prompt-icon">🔭</div>
+            <h2>Search the Galaxy</h2>
+            <p>Find lessons, coding challenges, and learning paths across the universe</p>
+            <p class="prompt-examples">Try searching for: "Python", "JavaScript", "Web Development"</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function showCategory(category) {
+    document.querySelectorAll('.category-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.getElementById(category).style.display = 'block';
+    event.target.classList.add('active');
+}
+</script>
+{% endblock %}

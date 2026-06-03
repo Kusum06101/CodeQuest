@@ -1,0 +1,78 @@
+{% extends "main.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>{{ page_title }}</h1>
+<a class="btn btn-primary" href="{% url create_url_name %}">
+    🚀 Create New Quest
+</a></section>
+
+<form method="get" class="search-form">
+    <input
+        type="search"
+        name="q"
+        value="{{ search_query }}"
+        placeholder="Search..."
+    >
+    <button type="submit" class="btn">Search</button>
+    <a href="." class="btn btn-light">Reset</a>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Record</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for object in object_list %}
+            <tr>
+                <td>
+                    <a href="{% url detail_url_name object.pk %}">
+                        {{ object }}
+                    </a>
+                </td>
+                <td>{{ object.created_at|default:"-" }}</td>
+                <td>{{ object.updated_at|default:"-" }}</td>
+                <td>
+                    <a href="{% url detail_url_name object.pk %}">View</a>
+                    |
+                    <a href="{% url update_url_name object.pk %}">Edit</a>
+                    |
+                    <a href="{% url delete_url_name object.pk %}">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No records found.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+            Previous
+        </a>
+    {% endif %}
+
+    <span>
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">
+            Next
+        </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

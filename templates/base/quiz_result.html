@@ -1,0 +1,41 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Quiz Results - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="result-container">
+    <div class="result-header {% if attempt.score >= 70 %}success{% else %}warning{% endif %}">
+        <h1>📝 Quiz Results</h1>
+        <div class="score-circle"><div class="score-value">{{ attempt.score|floatformat:0 }}%</div></div>
+        <div class="score-details">
+            <p>🎯 Score: {{ attempt.score|floatformat:1 }}%</p>
+            <p>⭐ XP Earned: +{{ attempt.xp_earned }} XP</p>
+        </div>
+    </div>
+
+    <div class="questions-review">
+        <h2>📋 Question Review</h2>
+        {% for answer in answers %}
+        <div class="review-card {% if answer.is_correct %}correct{% else %}incorrect{% endif %}">
+            <div class="review-header">
+                <span>Question {{ forloop.counter }}</span>
+                <span>{% if answer.is_correct %}✅ Correct{% else %}❌ Incorrect{% endif %}</span>
+            </div>
+            <div class="question-text">{{ answer.question.question_text|safe }}</div>
+            <div class="your-answer"><strong>Your Answer:</strong> {{ answer.selected_choice.choice_text|default:"Not answered" }}</div>
+            {% if not answer.is_correct %}
+            <div class="correct-answer"><strong>Correct Answer:</strong> 
+                {% for choice in answer.question.choices.all %}{% if choice.is_correct %}{{ choice.choice_text }}{% endif %}{% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="result-actions">
+        <a href="{% url 'lesson_detail' attempt.quiz.lesson.learning_path.slug attempt.quiz.lesson.slug %}" class="button primary">📚 Back to Lesson</a>
+        <a href="{% url 'learning_paths' %}" class="button secondary">🎯 More Paths</a>
+    </div>
+</div>
+{% endblock %}

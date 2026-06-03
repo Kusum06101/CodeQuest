@@ -1,0 +1,132 @@
+<!-- templates/base/home.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}CodeQuest - Learn Programming in Space!{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">🚀 Learn to Code<br>Through <span class="gradient-text">Space Adventures</span></h1>
+        <p class="hero-description">Transform your coding journey into an exciting space adventure with gamified lessons, real-time quizzes, and achievement badges. Master programming while exploring the galaxy!</p>
+        <div class="hero-buttons">
+            {% if user.is_authenticated %}
+                <a href="{% url 'learning_paths' %}" class="btn btn-primary">🚀 Continue Journey</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary">✨ Start Free Adventure</a>
+                <a href="{% url 'login' %}" class="btn btn-secondary">🔑 Login to Continue</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-card">
+            <div class="stat-icon">👨‍🚀</div>
+            <div class="stat-value">{{ stats.learners|default:"0" }}+</div>
+            <div class="stat-label">Active Astronauts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-value">{{ stats.lessons|default:"0" }}+</div>
+            <div class="stat-label">Galactic Lessons</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💻</div>
+            <div class="stat-value">{{ stats.challenges|default:"0" }}+</div>
+            <div class="stat-label">Coding Missions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🌍</div>
+            <div class="stat-value">{{ stats.languages|default:"0" }}</div>
+            <div class="stat-label">Languages</div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Languages -->
+<div class="featured-section">
+    <h2 class="section-title">🎯 Popular Space Languages</h2>
+    <div class="languages-grid">
+        {% for language in languages %}
+        <div class="language-card" onclick="location.href='{% url 'learning_paths' %}?language={{ language.id }}'">
+            <div class="language-icon">💻</div>
+            <h3>{{ language.name }}</h3>
+            <p class="language-version">{{ language.version }}</p>
+            <div class="language-stats">
+                <span>📚 {{ language.learning_paths.count }} paths</span>
+            </div>
+            <div class="language-footer">
+                <span class="explore-btn">Explore →</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Featured Learning Paths -->
+<div class="featured-section">
+    <h2 class="section-title">🌟 Featured Space Missions</h2>
+    <div class="paths-grid">
+        {% for path in featured_paths %}
+        <div class="learning-path-card" onclick="location.href='{% url 'learning_path_detail' path.slug %}'">
+            <div class="difficulty-badge {{ path.difficulty|lower }}">
+                {% if path.difficulty == 'BEGINNER' %}🌱 Beginner
+                {% elif path.difficulty == 'INTERMEDIATE' %}⭐ Intermediate
+                {% else %}🚀 Advanced{% endif %}
+            </div>
+            <h3 class="path-title">{{ path.title }}</h3>
+            <p class="path-description">{{ path.description|truncatewords:20 }}</p>
+            <div class="path-stats">
+                <span>💻 {{ path.language.name }}</span>
+                <span>⏱️ {{ path.estimated_hours }}h</span>
+                <span>📚 {{ path.lessons.count }} lessons</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="how-it-works">
+    <h2 class="section-title">🎮 How Your Space Journey Works</h2>
+    <div class="steps-grid">
+        <div class="step-card">
+            <div class="step-number">01</div>
+            <div class="step-icon">🚀</div>
+            <h3>Launch Your Mission</h3>
+            <p>Create your astronaut profile and start your coding adventure</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">02</div>
+            <div class="step-icon">🌍</div>
+            <h3>Choose Your Planet</h3>
+            <p>Select from multiple programming languages and learning paths</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">03</div>
+            <div class="step-icon">💻</div>
+            <h3>Complete Missions</h3>
+            <p>Learn through interactive lessons and coding challenges</p>
+        </div>
+        <div class="step-card">
+            <div class="step-number">04</div>
+            <div class="step-icon">🏆</div>
+            <h3>Eliminate the Boss</h3>
+            <p>Eliminate the boss by successfully learning and passing the final boss test.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Launch Your Coding Adventure?</h2>
+        <p>Join thousands of astronauts mastering programming through gamified space missions!</p>
+        {% if not user.is_authenticated %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-large">🚀 Create Your Astronaut Profile</a>
+        {% else %}
+            <a href="{% url 'learning_paths' %}" class="btn btn-primary btn-large">🎮 Continue Your Journey</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

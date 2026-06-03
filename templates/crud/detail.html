@@ -1,0 +1,29 @@
+{% extends "main.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>{{ object }}</h1>
+
+    <div>
+        <a class="btn btn-light" href="{% url list_url_name %}">Back</a>
+        <a class="btn btn-primary" href="{% url update_url_name object.pk %}">Edit</a>
+        <a class="btn btn-danger" href="{% url delete_url_name object.pk %}">Delete</a>
+    </div>
+</section>
+
+<div class="card">
+    <p><strong>ID:</strong> {{ object.pk }}</p>
+
+    {% if object.created_at %}
+        <p><strong>Created At:</strong> {{ object.created_at }}</p>
+    {% endif %}
+
+    {% if object.updated_at %}
+        <p><strong>Updated At:</strong> {{ object.updated_at }}</p>
+    {% endif %}
+
+    <p><strong>Record:</strong> {{ object }}</p>
+</div>
+{% endblock %}

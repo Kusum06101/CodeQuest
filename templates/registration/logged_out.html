@@ -1,0 +1,36 @@
+{% extends "main.html" %}
+
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1 class="page-title">🚀 Mission Complete</h1>
+</div>
+
+<section class="panel logout-panel">
+
+    <div class="logout-character">
+        🐱‍🚀
+    </div>
+
+    <h2>Logged Out Successfully</h2>
+
+    <p>
+        Thank You for visiting Code Quest! Your coding adventure is paused.
+        Come back soon to continue earning XP, badges, and achievements.
+    </p>
+
+    <div class="actions logout-actions">
+        <a class="button" href="{% url 'login' %}"><button>
+            🚀 Login Again</button>
+        </a>
+
+        <a class="button secondary" href="{% url 'register' %}">
+           <button> 🌌 Create Account</button>
+        </a>
+    </div>
+
+</section>
+
+{% endblock %}

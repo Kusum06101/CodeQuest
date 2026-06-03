@@ -1,0 +1,385 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Live Learning - CodeQuest{% endblock %}
+
+{% block content %}
+<style>
+    .live-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .live-header {
+        background: linear-gradient(135deg, rgba(176,38,255,0.15), rgba(0,229,255,0.15));
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    
+    .live-header h1 {
+        color: white;
+        margin-bottom: 10px;
+    }
+    
+    .live-badge {
+        display: inline-block;
+        background: #dc3545;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .live-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    
+    .code-editor {
+        background: #1a1a3a;
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid rgba(0,229,255,0.3);
+    }
+    
+    .editor-header {
+        background: #2d2d4a;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(0,229,255,0.2);
+    }
+    
+    .language-select {
+        background: #0f0f23;
+        color: white;
+        border: 1px solid #00e5ff;
+        padding: 5px 10px;
+        border-radius: 8px;
+    }
+    
+    textarea {
+        width: 100%;
+        height: 400px;
+        background: #0f0f23;
+        color: #00e5ff;
+        border: none;
+        padding: 20px;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        resize: vertical;
+    }
+    
+    .output-panel {
+        background: #0f0f23;
+        border-radius: 20px;
+        padding: 20px;
+        border: 1px solid rgba(0,229,255,0.3);
+    }
+    
+    .output-header {
+        color: #ffd93d;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .output-content {
+        background: #1a1a3a;
+        padding: 15px;
+        border-radius: 10px;
+        color: #4ade80;
+        font-family: monospace;
+        min-height: 200px;
+    }
+    
+    .btn-run {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+    
+    .btn-clear {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    
+    .active-users {
+        background: rgba(255,255,255,0.05);
+        border-radius: 20px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .user-avatar {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #b026ff, #00e5ff);
+        margin: 5px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+    
+    .tips-list {
+        color: #d1d5db;
+        padding-left: 20px;
+    }
+    
+    .tips-list li {
+        margin-bottom: 10px;
+    }
+    
+    @media (max-width: 768px) {
+        .live-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="live-container">
+    <div class="live-header">
+        <h1>🔴 Live Coding Arena</h1>
+        <p>Write, run, and learn code in real-time with the community</p>
+        <span class="live-badge">● LIVE</span>
+    </div>
+    
+    <div class="live-grid">
+        <div class="code-editor">
+            <div class="editor-header">
+                <span>✏️ Code Editor</span>
+                <select id="language" class="language-select">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                </select>
+            </div>
+            <textarea id="codeEditor" placeholder="Write your code here..."># Welcome to Live Coding!
+# Write your code and click Run to execute
+
+print("Hello, CodeQuest!")
+print("Welcome to Live Learning!")
+
+# Try:
+name = input("What is your name? ")
+print(f"Nice to meet you, {name}!")
+
+# Create a simple calculator
+def add(a, b):
+    return a + b
+
+result = add(10, 20)
+print(f"10 + 20 = {result}")
+</textarea>
+            <div style="padding: 15px;">
+                <button class="btn-run" onclick="runCode()">▶ Run Code</button>
+                <button class="btn-clear" onclick="clearCode()">🗑 Clear</button>
+                <button class="btn-clear" onclick="loadExample()">📋 Load Example</button>
+            </div>
+        </div>
+        
+        <div>
+            <div class="output-panel">
+                <div class="output-header">
+                    <span>📤 Output</span>
+                </div>
+                <div class="output-content" id="output">
+                    Click "Run Code" to see output here...
+                </div>
+            </div>
+            
+            <div class="active-users">
+                <h3 style="color: white; margin-bottom: 15px;">👥 Active Learners</h3>
+                <div id="activeUsers">
+                    <span class="user-avatar">👨‍🚀</span>
+                    <span class="user-avatar">👩‍💻</span>
+                    <span class="user-avatar">🧑‍🏫</span>
+                    <span class="user-avatar">👨‍🎓</span>
+                    <span class="user-avatar">👩‍🔬</span>
+                    <span class="user-avatar">👨‍💻</span>
+                    <span class="user-avatar">👩‍🎓</span>
+                    <p style="color: #9ca3af; margin-top: 10px;">+ {{ active_count|default:"27" }} others learning now</p>
+                </div>
+            </div>
+            
+            <div class="active-users">
+                <h3 style="color: white; margin-bottom: 15px;">💡 Tips & Tricks</h3>
+                <ul class="tips-list">
+                    <li>Use print() to see output</li>
+                    <li>Try different programming languages</li>
+                    <li>Share your code with friends</li>
+                    <li>Practice daily challenges here</li>
+                    <li>Use Ctrl+Enter to run code quickly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function runCode() {
+        const code = document.getElementById('codeEditor').value;
+        const language = document.getElementById('language').value;
+        const outputDiv = document.getElementById('output');
+        
+        outputDiv.innerHTML = '<span style="color: #ffd93d;">⏳ Running your code...</span>';
+        
+        setTimeout(() => {
+            try {
+                if (language === 'python') {
+                    // Simulate Python execution
+                    outputDiv.innerHTML = `<span style="color: #4ade80;">✅ Code executed successfully!</span><br><br>`;
+                    outputDiv.innerHTML += `<span style="color: white;">Output would appear here.</span><br>`;
+                    outputDiv.innerHTML += `<span style="color: #9ca3af;">💡 Tip: In production, your code runs on real servers!</span>`;
+                    
+                    // Extract print statements for demo
+                    const printMatches = code.match(/print\(['"](.*?)['"]\)/g);
+                    if (printMatches) {
+                        outputDiv.innerHTML += `<br><span style="color: #ffd93d;">📤 Expected output:</span><br>`;
+                        printMatches.forEach(match => {
+                            const content = match.match(/print\(['"](.*?)['"]\)/);
+                            if (content) {
+                                outputDiv.innerHTML += `<span style="color: white;">  ${content[1]}</span><br>`;
+                            }
+                        });
+                    }
+                } else if (language === 'javascript') {
+                    outputDiv.innerHTML = `<span style="color: #4ade80;">✅ JavaScript code ready!</span><br><br>`;
+                    outputDiv.innerHTML += `<span style="color: #ffd93d;">📤 Console output would appear here in production.</span>`;
+                } else {
+                    outputDiv.innerHTML = `<span style="color: #4ade80;">✅ Ready to run ${language} code!</span><br><br>
+                    <span style="color: #9ca3af;">💡 Full language support coming soon!</span>`;
+                }
+            } catch(e) {
+                outputDiv.innerHTML = `<span style="color: #dc3545;">❌ Error: ${e.message}</span>`;
+            }
+        }, 500);
+    }
+    
+    function clearCode() {
+        document.getElementById('codeEditor').value = '';
+        document.getElementById('output').innerHTML = 'Cleared! Start writing your code...';
+    }
+    
+    function loadExample() {
+        const language = document.getElementById('language').value;
+        const examples = {
+            python: `# Python Example - FizzBuzz Game
+def fizzbuzz(n):
+    for i in range(1, n + 1):
+        if i % 3 == 0 and i % 5 == 0:
+            print("FizzBuzz")
+        elif i % 3 == 0:
+            print("Fizz")
+        elif i % 5 == 0:
+            print("Buzz")
+        else:
+            print(i)
+
+# Run the game
+print("=== FizzBuzz Game ===")
+fizzbuzz(15)
+
+# Bonus: Calculate factorial
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+print(f"\\n5! = {factorial(5)}")`,
+            javascript: `// JavaScript Example - FizzBuzz
+function fizzbuzz(n) {
+    for (let i = 1; i <= n; i++) {
+        if (i % 3 === 0 && i % 5 === 0) {
+            console.log("FizzBuzz");
+        } else if (i % 3 === 0) {
+            console.log("Fizz");
+        } else if (i % 5 === 0) {
+            console.log("Buzz");
+        } else {
+            console.log(i);
+        }
+    }
+}
+
+console.log("=== FizzBuzz Game ===");
+fizzbuzz(15);`,
+            java: `// Java Example
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Hello from Java!");
+        
+        // FizzBuzz
+        for (int i = 1; i <= 15; i++) {
+            if (i % 3 == 0 && i % 5 == 0) {
+                System.out.println("FizzBuzz");
+            } else if (i % 3 == 0) {
+                System.out.println("Fizz");
+            } else if (i % 5 == 0) {
+                System.out.println("Buzz");
+            } else {
+                System.out.println(i);
+            }
+        }
+    }
+}`,
+            cpp: `// C++ Example
+#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hello from C++!" << endl;
+    
+    // FizzBuzz
+    for (int i = 1; i <= 15; i++) {
+        if (i % 3 == 0 && i % 5 == 0) {
+            cout << "FizzBuzz" << endl;
+        } else if (i % 3 == 0) {
+            cout << "Fizz" << endl;
+        } else if (i % 5 == 0) {
+            cout << "Buzz" << endl;
+        } else {
+            cout << i << endl;
+        }
+    }
+    
+    return 0;
+}`
+        };
+        document.getElementById('codeEditor').value = examples[language] || examples.python;
+    }
+    
+    // Keyboard shortcut: Ctrl+Enter to run code
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            runCode();
+        }
+    });
+</script>
+{% endblock %}

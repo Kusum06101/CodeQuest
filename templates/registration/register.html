@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Create Account</h1>
+</div>
+
+<form method="post" class="panel form-grid" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="message error">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {{ form.as_p }}
+
+    <div class="actions">
+        <button type="submit">Create Account</button>
+        <a class="button secondary" href="{% url 'login' %}"><button>Already have an account?</button></a>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,136 @@
+<!-- templates/base/dashboard.html -->
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h1>👨‍🚀 Mission Control, {{ user.first_name|default:user.username }}!</h1>
+        <p>Your coding journey through the galaxy is progressing well. Continue your space missions!</p>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-value">{{ completed_lessons_count }}/{{ total_lessons }}</div>
+            <div class="stat-label">Missions Completed</div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: {{ completion_percentage }}%"></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value">{{ user.total_xp }}</div>
+            <div class="stat-label">Total XP Earned</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🔥</div>
+            <div class="stat-value">{{ user.profile.streak_count|default:0 }}</div>
+            <div class="stat-label">Day Streak</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-value">{{ user.badges.count }}</div>
+            <div class="stat-label">Badges Earned</div>
+        </div>
+    </div>
+    
+    <!-- Next Level Progress -->
+    <div class="level-progress-card">
+        <h3>🚀 Next Level Progress</h3>
+        <div class="level-info">
+            <span>Current Level: {{ user.current_level }}</span>
+            <span>{{ user.total_xp }}/{{ xp_for_next_level }} XP to Level {{ user.current_level|add:"1" }}</span>
+        </div>
+        <div class="progress-bar large">
+            <div class="progress-fill" style="width: {{ xp_progress }}%"></div>
+        </div>
+    </div>
+    
+    <!-- Active Learning Paths -->
+    <div class="section">
+        <h2>🎯 Your Active Space Missions</h2>
+        <div class="paths-grid">
+            {% for progress in active_paths %}
+            <div class="learning-path-card" onclick="location.href='{% url 'learning_path_detail' progress.learning_path.slug %}'">
+                <div class="difficulty-badge {{ progress.learning_path.difficulty|lower }}">
+                    {{ progress.learning_path.get_difficulty_display }}
+                </div>
+                <h3 class="path-title">{{ progress.learning_path.title }}</h3>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ progress.progress_percent }}%"></div>
+                    </div>
+                    <span>{{ progress.progress_percent }}% Complete</span>
+                </div>
+                <a href="{% url 'learning_path_detail' progress.learning_path.slug %}" class="btn btn-secondary btn-small">Continue Mission →</a>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>🌌 No active missions. Start a learning path to begin your space journey!</p>
+                <a href="{% url 'learning_paths' %}" class="btn btn-primary">Browse Missions</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="two-columns">
+        <div class="section">
+            <h2>📝 Recent Quiz Attempts</h2>
+            {% for attempt in recent_quizzes %}
+            <div class="activity-item">
+                <div class="activity-icon">📝</div>
+                <div class="activity-details">
+                    <strong>{{ attempt.quiz.title }}</strong>
+                    <span>Score: {{ attempt.score|floatformat:1 }}%</span>
+                    <small>{{ attempt.submitted_at|timesince }} ago</small>
+                </div>
+                <div class="activity-xp">+{{ attempt.xp_earned }} XP</div>
+            </div>
+            {% empty %}
+            <p class="empty-message">No quiz attempts yet. Take your first quiz!</p>
+            {% endfor %}
+        </div>
+        
+        <div class="section">
+            <h2>💻 Recent Submissions</h2>
+            {% for submission in recent_submissions %}
+            <div class="activity-item">
+                <div class="activity-icon">💻</div>
+                <div class="activity-details">
+                    <strong>{{ submission.challenge.title }}</strong>
+                    <span class="status-badge {{ submission.status|lower }}">{{ submission.get_status_display }}</span>
+                    <small>{{ submission.created_at|timesince }} ago</small>
+                </div>
+                <div class="activity-xp">{% if submission.status == 'ACCEPTED' %}+{{ submission.challenge.xp_reward }} XP{% endif %}</div>
+            </div>
+            {% empty %}
+            <p class="empty-message">No submissions yet. Try some challenges!</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <!-- Recent Badges -->
+    <div class="section">
+        <h2>🏅 Recently Earned Badges</h2>
+        <div class="badges-grid">
+            {% for user_badge in recent_badges %}
+            <div class="badge-card">
+                <div class="badge-icon">🏆</div>
+                <div class="badge-info">
+                    <strong>{{ user_badge.badge.name }}</strong>
+                    <small>{{ user_badge.awarded_at|date:"M d, Y" }}</small>
+                </div>
+            </div>
+            {% empty %}
+            <p class="empty-message">Complete achievements to earn badges!</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Strong Cache Control - Prevent any caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, private">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Cache" content="no-cache">
+    
+    <title>{% block title %}CodeQuest - Learn Programming in Space!{% endblock %}</title>
+    
+    {% load static %}
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    
+    <!-- Space Theme Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS - Add version parameter to force reload -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    
+    <!-- Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0a0a2a;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        /* RESTORED LOGO STYLES - White color with glow */
+        .nav-brand a {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            font-family: 'Orbitron', monospace;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 20px rgba(176, 38, 255, 0.3);
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+        }
+        
+        .nav-brand a:hover {
+            text-shadow: 0 0 15px rgba(0, 229, 255, 0.8), 0 0 25px rgba(176, 38, 255, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .nav-links a:hover {
+            color: #00e5ff;
+            background: rgba(0, 229, 255, 0.1);
+        }
+        
+        /* Admin Dropdown Styles */
+        .admin-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .admin-toggle {
+            cursor: pointer;
+            padding: 8px 12px;
+            display: inline-block;
+            color: #ffd93d;
+            font-weight: 500;
+            transition: all 0.3s;
+            border-radius: 8px;
+        }
+        
+        .admin-toggle:hover {
+            color: #ffed4e;
+            background: rgba(255, 217, 61, 0.1);
+        }
+        
+        .admin-dropdown-content {
+            display: none;
+            position: absolute;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-width: 220px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            z-index: 1000;
+            top: 100%;
+            right: 0;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .admin-dropdown-content a {
+            color: white !important;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .admin-dropdown-content a:hover {
+            background: rgba(102, 126, 234, 0.3);
+            color: #00e5ff !important;
+        }
+        
+        .admin-dropdown:hover .admin-dropdown-content {
+            display: block;
+        }
+        
+        .logout-form {
+            display: inline;
+        }
+        
+        .nav-logout {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .nav-logout:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Quick Add Button Styles */
+        .floating-add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .floating-add-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+        
+        .floating-add-btn i {
+            font-size: 28px;
+        }
+        
+        /* Admin Action Bar */
+        .admin-action-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .admin-action-bar h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .quick-add-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-quick-add {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-quick-add:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+        
+        .btn-quick-add i {
+            margin-right: 5px;
+        }
+        
+        /* XP Bar Styles */
+        .xp-bar-container {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 10px 20px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .xp-bar-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .xp-bar-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        
+        .xp-level {
+            color: #ffd93d;
+            font-weight: bold;
+        }
+        
+        .xp-points {
+            color: #00e5ff;
+        }
+        
+        .xp-bar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .xp-bar-fill {
+            background: linear-gradient(90deg, #00e5ff, #b026ff);
+            border-radius: 10px;
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .xp-next-level {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        /* Messages */
+        .messages {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1100;
+        }
+        
+        .message {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .message.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .message.error {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+        
+        .message.warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #333;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Footer */
+        .site-footer {
+            background: linear-gradient(135deg, #0a0a2a, #0f0f23);
+            color: white;
+            padding: 40px 20px 20px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(0, 229, 255, 0.2);
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-section h4 {
+            color: #00e5ff;
+            margin-bottom: 15px;
+        }
+        
+        .footer-section a {
+            color: #d1d5db;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: #00e5ff;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px;
+            color: #9ca3af;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a2a, #1a1a3e);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(0, 229, 255, 0.3);
+            border-top-color: #00e5ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loader-text {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(135deg, #00e5ff, #b026ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .loader-subtitle {
+            margin-top: 10px;
+            color: #9ca3af;
+        }
+        
+        /* Sound and Particles Toggles */
+        .sound-toggle, .particles-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s;
+        }
+        
+        .particles-toggle {
+            left: 70px;
+        }
+        
+        .sound-toggle:hover, .particles-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .galaxy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, #0a0a2a 0%, #000000 100%);
+        }
+        
+        .page {
+            min-height: calc(100vh - 200px);
+            padding: 20px;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                justify-content: center;
+            }
+            
+            .nav-links a {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .admin-dropdown-content {
+                right: auto;
+                left: 0;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Fix back/forward navigation -->
+    <script>
+        (function() {
+            let pageReloaded = false;
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted && !pageReloaded) {
+                    pageReloaded = true;
+                    window.location.reload();
+                }
+            });
+            if (window.performance) {
+                try {
+                    const navEntries = performance.getEntriesByType('navigation');
+                    if (navEntries.length > 0 && navEntries[0].type === 'back_forward') {
+                        window.location.reload();
+                    }
+                } catch(e) {}
+            }
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        })();
+    </script>
+    
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader-spinner"></div>
+        <div class="loader-text">🚀 Launching CodeQuest...</div>
+        <div class="loader-subtitle">Preparing your learning adventure</div>
+    </div>
+    
+    <!-- Navbar with ALL Navigation Tabs -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <a href="{% url 'home' %}">CodeQuest</a>
+        </div>
+    
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+                <!-- Main Navigation Tabs - ALL VISIBLE -->
+                <a href="{% url 'home' %}">🏠 Home</a>
+                <a href="{% url 'learning_paths' %}">📚 Learning Paths</a>
+                <a href="{% url 'challenges' %}">💻 Challenges</a>
+                <a href="{% url 'quizzes' %}">📝 Quizzes</a>
+                <a href="{% url 'leaderboard' %}">🏆 Leaderboard</a>
+                <a href="{% url 'dashboard' %}">📊 Dashboard</a>
+                <a href="{% url 'profile' %}">👤 Profile</a>
+                <a href="/realtime/">🔴 Live Learning</a>
+                <a href="{% url 'search' %}">🔍 Search</a>
+                
+                <!-- Admin Links (only for staff users) -->
+                {% if user.is_staff %}
+                    <div class="admin-dropdown">
+                        <span class="admin-toggle">🔧 Admin ▼</span>
+                        <div class="admin-dropdown-content">
+                            <a href="{% url 'learning-path-list' %}">🛤️ Manage Paths</a>
+                            <a href="{% url 'challenge-list' %}">💪 Manage Challenges</a>
+                            <a href="{% url 'quiz-list' %}">📝 Manage Quizzes</a>
+                            <a href="{% url 'badge-list' %}">🏅 Manage Badges</a>
+                            <a href="{% url 'user-list' %}">👥 Manage Users</a>
+                            <a href="{% url 'programming-language-list' %}">💻 Manage Languages</a>
+                        </div>
+                    </div>
+                {% endif %}
+    
+                <form method="post" action="{% url 'logout' %}" class="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-logout">🚪 Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">🔑 Login</a>
+                <a href="{% url 'register' %}">✨ Register</a>
+            {% endif %}
+        </div>
+    </nav>
+    
+    <!-- Admin Action Bar (Only for staff users) -->
+    {% if user.is_authenticated and user.is_staff %}
+    <div class="admin-action-bar" style="margin: 20px;">
+        <h3><i class="fas fa-crown"></i> Admin Quick Actions</h3>
+        <div class="quick-add-buttons">
+            <button class="btn-quick-add" onclick="openCreateModal('learning-path')">
+                <i class="fas fa-road"></i> New Learning Path
+            </button>
+            <button class="btn-quick-add" onclick="openCreateModal('lesson')">
+                <i class="fas fa-book"></i> New Lesson
+            </button>
+            <button class="btn-quick-add" onclick="openCreateModal('challenge')">
+                <i class="fas fa-code"></i> New Challenge
+            </button>
+            <button class="btn-quick-add" onclick="openCreateModal('quiz')">
+                <i class="fas fa-tasks"></i> New Quiz
+            </button>
+            <button class="btn-quick-add" onclick="openCreateModal('language')">
+                <i class="fas fa-language"></i> New Language
+            </button>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- XP Bar (shown when logged in) -->
+    {% if user.is_authenticated %}
+    <div class="xp-bar-container">
+        <div class="xp-bar-wrapper">
+            <div class="xp-bar-info">
+                <span class="xp-level">⭐ Level {{ user.current_level }}</span>
+                <span class="xp-points">{{ user.total_xp }} XP</span>
+            </div>
+            <div class="xp-bar-track">
+                <div class="xp-bar-fill" style="width: {{ xp_progress|default:0 }}%"></div>
+            </div>
+            <div class="xp-next-level">Next Level: {{ xp_for_next_level|default:1000 }} XP</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="message {{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Main Content -->
+    <main class="page">
+        {% block content %}
+        <!-- Default content block -->
+        <div style="text-align: center; padding: 50px;">
+            <h1 style="color: white;">Welcome to CodeQuest!</h1>
+            <p style="color: #d1d5db;">Start your coding journey today.</p>
+        </div>
+        {% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>🚀 CodeQuest</h4>
+                <p>Learn programming through gamified space adventures</p>
+                <p>Master coding with interactive lessons and real-time quizzes</p>
+            </div>
+            <div class="footer-section">
+                <h4>📚 Quick Links</h4>
+                <a href="{% url 'learning_paths' %}">📚 Learning Paths</a>
+                <a href="{% url 'leaderboard' %}">🏆 Leaderboard</a>
+                <a href="{% url 'dashboard' %}">📊 Dashboard</a>
+                <a href="/realtime/">🔴 Live Learning</a>
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}">✨ Sign Up</a>
+                {% endif %}
+            </div>
+            <div class="footer-section">
+                <h4>💻 Languages</h4>
+                <a href="{% url 'learning_paths' %}?language=1">🐍 Python</a>
+                <a href="{% url 'learning_paths' %}?language=2">📜 JavaScript</a>
+                <a href="{% url 'learning_paths' %}?language=3">☕ Java</a>
+                <a href="{% url 'learning_paths' %}?language=4">🎨 HTML/CSS</a>
+            </div>
+            <div class="footer-section">
+                <h4>🌌 Connect</h4>
+                <a href="#">💬 Discord Community</a>
+                <a href="#">🐙 GitHub</a>
+                <a href="#">🐦 Twitter</a>
+                <a href="#">📧 Contact Us</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CodeQuest Space Academy | Make Learning an Adventure! 🚀</p>
+        </div>
+    </footer>
+    
+    <!-- Floating Add Button (Only for staff users) -->
+    {% if user.is_authenticated and user.is_staff %}
+    <button class="floating-add-btn" onclick="openQuickAddMenu()" id="floatingAddBtn">
+        <i class="fas fa-plus"></i>
+    </button>
+    
+    <!-- Quick Add Menu -->
+    <div id="quickAddMenu" style="display: none; position: fixed; bottom: 100px; right: 30px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 15px; padding: 15px; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 200px;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button onclick="openCreateModal('learning-path')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
+                <i class="fas fa-road"></i> New Learning Path
+            </button>
+            <button onclick="openCreateModal('lesson')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
+                <i class="fas fa-book"></i> New Lesson
+            </button>
+            <button onclick="openCreateModal('challenge')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
+                <i class="fas fa-code"></i> New Challenge
+            </button>
+            <button onclick="openCreateModal('quiz')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
+                <i class="fas fa-tasks"></i> New Quiz
+            </button>
+            <button onclick="openCreateModal('language')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
+                <i class="fas fa-language"></i> New Language
+            </button>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Create Modal -->
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create New</h2>
+                <button class="close-modal" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="createForm" method="post">
+                    {% csrf_token %}
+                    <div id="formFields">
+                        <!-- Dynamic form fields will be loaded here -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
+                <button class="btn-submit" onclick="submitCreateForm()">Create</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sound Toggles -->
+    <div class="sound-toggle" data-tooltip="Toggle Sound">🔊</div>
+    <div class="particles-toggle" data-tooltip="Toggle Particles">✨</div>
+    
+    <!-- JavaScript -->
+    <script src="{% static 'js/main.js' %}?v=2"></script>
+    <script>
+        // ============================================
+        // QUICK ADD FUNCTIONALITY
+        // ============================================
+        
+        let currentModalType = null;
+        
+        function openQuickAddMenu() {
+            const menu = document.getElementById('quickAddMenu');
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+                setTimeout(() => {
+                    document.addEventListener('click', closeQuickAddMenuOnClickOutside);
+                }, 100);
+            } else {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeQuickAddMenuOnClickOutside);
+            }
+        }
+        
+        function closeQuickAddMenuOnClickOutside(e) {
+            const menu = document.getElementById('quickAddMenu');
+            const btn = document.getElementById('floatingAddBtn');
+            if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                menu.style.display = 'none';
+                document.removeEventListener('click', closeQuickAddMenuOnClickOutside);
+            }
+        }
+        
+        async function openCreateModal(type) {
+            currentModalType = type;
+            const modal = document.getElementById('createModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const formFields = document.getElementById('formFields');
+            
+            const titles = {
+                'learning-path': 'Create New Learning Path',
+                'lesson': 'Create New Lesson',
+                'challenge': 'Create New Challenge',
+                'quiz': 'Create New Quiz',
+                'language': 'Create New Programming Language'
+            };
+            modalTitle.textContent = titles[type] || 'Create New';
+            
+            let fieldsHtml = '';
+            
+            switch(type) {
+                case 'learning-path':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="title" required placeholder="e.g., Python Mastery">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug *</label>
+                            <input type="text" name="slug" required placeholder="e.g., python-mastery">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" rows="3" placeholder="Describe this learning path..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Language</label>
+                            <select name="language">
+                                <option value="">Select Language</option>
+                                ${await getLanguages()}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Difficulty Level</label>
+                            <select name="difficulty">
+                                <option value="BEGINNER">Beginner</option>
+                                <option value="INTERMEDIATE">Intermediate</option>
+                                <option value="ADVANCED">Advanced</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'lesson':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="title" required placeholder="e.g., Introduction to Variables">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug *</label>
+                            <input type="text" name="slug" required placeholder="e.g., introduction-to-variables">
+                        </div>
+                        <div class="form-group">
+                            <label>Learning Path</label>
+                            <select name="learning_path">
+                                <option value="">Select Learning Path</option>
+                                ${await getLearningPaths()}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Theory Content</label>
+                            <textarea name="theory_content" rows="5" placeholder="Lesson content..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Example Code</label>
+                            <textarea name="example_code" rows="3" placeholder="Code examples..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Order</label>
+                            <input type="number" name="order" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>XP Reward</label>
+                            <input type="number" name="xp_reward" value="10">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'challenge':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="title" required placeholder="e.g., Reverse a String">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug *</label>
+                            <input type="text" name="slug" required placeholder="e.g., reverse-a-string">
+                        </div>
+                        <div class="form-group">
+                            <label>Problem Statement</label>
+                            <textarea name="problem_statement" rows="3" placeholder="Challenge description..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Language</label>
+                            <select name="language">
+                                <option value="">Select Language</option>
+                                ${await getLanguages()}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Difficulty</label>
+                            <select name="difficulty">
+                                <option value="EASY">Easy</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="HARD">Hard</option>
+                            </select>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'quiz':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Title *</label>
+                            <input type="text" name="title" required placeholder="Quiz Title">
+                        </div>
+                        <div class="form-group">
+                            <label>Lesson</label>
+                            <select name="lesson">
+                                <option value="">Select Lesson</option>
+                                ${await getLessons()}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Passing Score (%)</label>
+                            <input type="number" name="passing_score" value="70" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label>XP Reward</label>
+                            <input type="number" name="xp_reward" value="20">
+                        </div>
+                    `;
+                    break;
+                    
+                case 'language':
+                    fieldsHtml = `
+                        <div class="form-group">
+                            <label>Name *</label>
+                            <input type="text" name="name" required placeholder="e.g., Python">
+                        </div>
+                        <div class="form-group">
+                            <label>Slug *</label>
+                            <input type="text" name="slug" required placeholder="e.g., python">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="description" rows="2" placeholder="Language description..."></textarea>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            formFields.innerHTML = fieldsHtml;
+            modal.style.display = 'block';
+        }
+        
+        async function getLanguages() {
+            try {
+                const response = await fetch('/api/languages/');
+                const languages = await response.json();
+                return languages.map(lang => `<option value="${lang.id}">${lang.name}</option>`).join('');
+            } catch(e) {
+                return '';
+            }
+        }
+        
+        async function getLearningPaths() {
+            try {
+                const response = await fetch('/api/learning-paths/');
+                const paths = await response.json();
+                return paths.map(path => `<option value="${path.id}">${path.title}</option>`).join('');
+            } catch(e) {
+                return '';
+            }
+        }
+        
+        async function getLessons() {
+            try {
+                const response = await fetch('/api/lessons/');
+                const lessons = await response.json();
+                return lessons.map(lesson => `<option value="${lesson.id}">${lesson.title}</option>`).join('');
+            } catch(e) {
+                return '';
+            }
+        }
+        
+        async function submitCreateForm() {
+            const form = document.getElementById('createForm');
+            const formData = new FormData(form);
+            const data = {};
+            
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            let endpoint = '';
+            let redirectUrl = '';
+            
+            switch(currentModalType) {
+                case 'learning-path':
+                    endpoint = '/api/learning-paths/';
+                    redirectUrl = '/learn/';
+                    break;
+                case 'lesson':
+                    endpoint = '/api/lessons/';
+                    redirectUrl = '/learn/';
+                    break;
+                case 'challenge':
+                    endpoint = '/api/challenges/';
+                    redirectUrl = '/challenges/';
+                    break;
+                case 'quiz':
+                    endpoint = '/api/quizzes/';
+                    redirectUrl = '/quizzes/';
+                    break;
+                case 'language':
+                    endpoint = '/api/languages/';
+                    redirectUrl = '/learn/';
+                    break;
+            }
+            
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    showToast('Created successfully! 🎉');
+                    setTimeout(() => {
+                        window.location.href = redirectUrl;
+                    }, 1500);
+                } else {
+                    const error = await response.json();
+                    showToast('Error: ' + JSON.stringify(error), 'error');
+                }
+            } catch(e) {
+                showToast('Error creating item: ' + e.message, 'error');
+            }
+        }
+        
+        function closeCreateModal() {
+            document.getElementById('createModal').style.display = 'none';
+            currentModalType = null;
+        }
+        
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('createModal');
+            if (event.target === modal) closeCreateModal();
+        }
+        
+        // Hide loading screen
+        window.addEventListener('pageshow', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen && loadingScreen.style.display !== 'none') {
+                loadingScreen.style.display = 'none';
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof hljs !== 'undefined') hljs.highlightAll();
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                setTimeout(function() { loadingScreen.style.display = 'none'; }, 100);
+            }
+        });
+        
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.transition = 'opacity 0.5s ease';
+                    loadingScreen.style.opacity = '0';
+                    setTimeout(function() { loadingScreen.style.display = 'none'; }, 500);
+                }
+            }, 800);
+        });
+        
+        const galaxyDiv = document.createElement('div');
+        galaxyDiv.className = 'galaxy';
+        if (document.body.firstChild) {
+            document.body.insertBefore(galaxyDiv, document.body.firstChild);
+        } else {
+            document.body.appendChild(galaxyDiv);
+        }
+        
+        console.log('%c🚀 Welcome to CodeQuest Space Academy! 🚀', 'color: #00e5ff; font-size: 16px; font-weight: bold; font-family: monospace;');
+        console.log('%c🌌 Your coding journey through the galaxy begins here! 🌌', 'color: #b026ff; font-size: 14px; font-family: monospace;');
+        console.log('%c✨ Navigation tabs: Home, Learning Paths, Challenges, Quizzes, Leaderboard, Dashboard, Profile, Live Learning, Search ✨', 'color: #ffd93d; font-size: 12px; font-family: monospace;');
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,336 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}{{ lesson.title }} - CodeQuest{% endblock %}
+
+{% block content %}
+<div class="lesson-container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    
+    <!-- Lesson Header -->
+    <div class="lesson-header" style="background: linear-gradient(135deg, rgba(176,38,255,0.15), rgba(0,229,255,0.15)); border-radius: 20px; padding: 30px; margin-bottom: 30px;">
+        <div class="lesson-breadcrumb" style="margin-bottom: 15px;">
+            <a href="{% url 'learning_path_detail' lesson.learning_path.slug %}" style="color: #00e5ff; text-decoration: none;">
+                ← Back to {{ lesson.learning_path.title }}
+            </a>
+        </div>
+        <h1 style="color: white; font-size: 2rem; margin-bottom: 15px;">{{ lesson.title }}</h1>
+        <div class="lesson-meta" style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <span style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px;">🎯 {{ lesson.xp_reward }} XP</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 20px;">📖 Lesson {{ lesson.order }}</span>
+        </div>
+        
+        <!-- Learning Objectives -->
+        {% if lesson.learning_objectives %}
+        <div class="learning-objectives" style="background: rgba(0,229,255,0.1); border-left: 4px solid #00e5ff; padding: 15px; border-radius: 10px; margin-top: 15px;">
+            <h3 style="color: #00e5ff; margin-bottom: 10px;">🎯 Learning Objectives</h3>
+            <p style="color: white;">{{ lesson.learning_objectives }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="lesson-content" style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
+        
+        <!-- Left Column - Theory Content -->
+        <div class="theory-section">
+            {% if lesson.theory_content %}
+            <div class="theory-content" style="background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; margin-bottom: 25px;">
+                {{ lesson.theory_content|safe }}
+            </div>
+            {% endif %}
+
+            <!-- Key Concepts -->
+            {% if lesson.key_concepts %}
+            <div class="key-concepts" style="background: rgba(176,38,255,0.1); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #b026ff; margin-bottom: 15px;">🔑 Key Concepts</h3>
+                <div class="concepts-list" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    {% for concept in lesson.get_key_concepts_list %}
+                    <span style="background: rgba(176,38,255,0.2); padding: 8px 15px; border-radius: 20px; color: white;">{{ concept }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Code Examples -->
+            {% if lesson.example_code %}
+            <div class="code-example" style="background: #1a1a3a; border-radius: 15px; overflow: hidden; margin-bottom: 25px;">
+                <div style="background: #2d2d4a; padding: 10px 15px; border-bottom: 1px solid #3d3d5a;">
+                    <span style="color: #00e5ff;">💻 Code Example</span>
+                    <button onclick="copyCode()" style="float: right; background: none; border: none; color: white; cursor: pointer;">📋 Copy</button>
+                </div>
+                <pre style="margin: 0; padding: 20px; overflow-x: auto;"><code id="codeBlock" class="language-python">{{ lesson.example_code }}</code></pre>
+            </div>
+            {% endif %}
+
+            <!-- Practice Exercises -->
+            {% if lesson.practice_exercises %}
+            <div class="practice-exercises" style="background: rgba(255,193,7,0.1); border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+                <h3 style="color: #ffc107;">💪 Practice Exercises</h3>
+                <div style="color: white; line-height: 1.6;">
+                    {{ lesson.practice_exercises|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column - Quiz and Interactive -->
+        <div class="interactive-section">
+            
+            <!-- Mini Quiz -->
+            {% if lesson.quiz_questions_json %}
+            <div class="quiz-section" style="background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 15px; padding: 20px; position: sticky; top: 20px;">
+                <h3 style="color: #00e5ff; margin-bottom: 15px;">📝 Mini Quiz</h3>
+                <div id="quizContainer">
+                    <div id="quizQuestions"></div>
+                    <button onclick="submitQuiz()" class="submit-quiz-btn" style="background: linear-gradient(135deg, #b026ff, #00e5ff); color: white; border: none; padding: 12px 24px; border-radius: 10px; cursor: pointer; margin-top: 20px; width: 100%;">
+                        Submit Quiz
+                    </button>
+                </div>
+                <div id="quizResult" style="display: none;"></div>
+            </div>
+            {% endif %}
+
+            <!-- XP Progress -->
+            <div class="lesson-actions" style="background: rgba(255,255,255,0.05); border-radius: 15px; padding: 20px; margin-top: 20px;">
+                <div class="progress-info" style="margin-bottom: 15px;">
+                    <span>Lesson Progress</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar" style="background: rgba(255,255,255,0.1); border-radius: 10px; height: 8px; overflow: hidden;">
+                    <div id="progressFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, #00e5ff, #b026ff); transition: width 0.3s;"></div>
+                </div>
+                
+                {% if not is_completed %}
+                <button onclick="completeLesson()" class="complete-btn" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 20px; font-size: 16px;">
+                    ✅ Mark as Complete (+{{ lesson.xp_reward }} XP)
+                </button>
+                {% else %}
+                <div style="background: rgba(40,167,69,0.2); border: 1px solid #28a745; border-radius: 10px; padding: 15px; text-align: center; margin-top: 20px;">
+                    ✅ Lesson Completed! +{{ lesson.xp_reward }} XP Earned
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation between lessons -->
+    <div class="lesson-navigation" style="display: flex; justify-content: space-between; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+        {% if prev_lesson %}
+        <a href="{% url 'lesson_detail' lesson.learning_path.slug prev_lesson.slug %}" class="nav-btn" style="background: rgba(255,255,255,0.1); padding: 12px 24px; border-radius: 10px; text-decoration: none; color: white;">
+            ← Previous Lesson: {{ prev_lesson.title }}
+        </a>
+        {% else %}
+        <div></div>
+        {% endif %}
+        
+        {% if next_lesson %}
+        <a href="{% url 'lesson_detail' lesson.learning_path.slug next_lesson.slug %}" class="nav-btn" style="background: linear-gradient(135deg, #b026ff, #00e5ff); padding: 12px 24px; border-radius: 10px; text-decoration: none; color: white;">
+            Next Lesson: {{ next_lesson.title }} →
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .theory-content {
+        color: #e0e0e0;
+        line-height: 1.8;
+    }
+    
+    .theory-content h2 {
+        color: #00e5ff;
+        margin-top: 20px;
+    }
+    
+    .theory-content h3 {
+        color: #b026ff;
+        margin-top: 15px;
+    }
+    
+    .theory-content code {
+        background: #1a1a3a;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+    
+    .theory-content pre {
+        background: #1a1a3a;
+        padding: 15px;
+        border-radius: 10px;
+        overflow-x: auto;
+    }
+    
+    .quiz-option {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .quiz-option:hover {
+        background: rgba(0,229,255,0.1);
+        border-color: #00e5ff;
+    }
+    
+    .quiz-option.selected {
+        background: rgba(0,229,255,0.2);
+        border-color: #00e5ff;
+    }
+    
+    .quiz-question {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 10px;
+    }
+    
+    .quiz-question h4 {
+        color: #ffd93d;
+        margin-bottom: 10px;
+    }
+</style>
+
+<script>
+    let quizQuestions = {{ lesson.quiz_questions_json|default:'[]'|safe }};
+    let userAnswers = {};
+    
+    // Load quiz questions
+    function loadQuiz() {
+        const container = document.getElementById('quizQuestions');
+        if (!container || !quizQuestions.length) return;
+        
+        let html = '';
+        quizQuestions.forEach((q, idx) => {
+            html += `
+                <div class="quiz-question" data-qid="${idx}">
+                    <h4>Question ${idx + 1}: ${q.question}</h4>
+                    <div class="quiz-options">
+                        ${q.options.map((opt, optIdx) => `
+                            <div class="quiz-option" onclick="selectAnswer(${idx}, ${optIdx})" data-opt="${optIdx}">
+                                ${String.fromCharCode(65 + optIdx)}. ${opt}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    function selectAnswer(questionIdx, optionIdx) {
+        userAnswers[questionIdx] = optionIdx;
+        
+        // Update UI
+        const questionDiv = document.querySelector(`.quiz-question[data-qid="${questionIdx}"]`);
+        questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        questionDiv.querySelectorAll('.quiz-option')[optionIdx].classList.add('selected');
+    }
+    
+    function submitQuiz() {
+        let score = 0;
+        quizQuestions.forEach((q, idx) => {
+            if (userAnswers[idx] === q.correct) {
+                score++;
+            }
+        });
+        
+        const percentage = (score / quizQuestions.length) * 100;
+        const resultDiv = document.getElementById('quizResult');
+        const quizDiv = document.getElementById('quizContainer');
+        
+        quizDiv.style.display = 'none';
+        resultDiv.style.display = 'block';
+        
+        let message = '';
+        if (percentage === 100) {
+            message = '🎉 Perfect! You\'re a star! 🌟';
+        } else if (percentage >= 70) {
+            message = '👍 Good job! You passed!';
+        } else {
+            message = '📚 Review the lesson and try again!';
+        }
+        
+        resultDiv.innerHTML = `
+            <div style="background: rgba(0,229,255,0.1); border-radius: 15px; padding: 20px; text-align: center;">
+                <h3 style="color: #00e5ff;">Quiz Results</h3>
+                <p style="font-size: 2rem; color: #ffd93d;">${score}/${quizQuestions.length}</p>
+                <p>${percentage}% - ${message}</p>
+                <button onclick="resetQuiz()" style="background: linear-gradient(135deg, #b026ff, #00e5ff); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 15px;">
+                    Try Again
+                </button>
+            </div>
+        `;
+        
+        // Update progress if passed
+        if (percentage >= 70) {
+            updateProgress(50); // 50% progress from quiz
+        }
+    }
+    
+    function resetQuiz() {
+        userAnswers = {};
+        document.getElementById('quizContainer').style.display = 'block';
+        document.getElementById('quizResult').style.display = 'none';
+        loadQuiz();
+    }
+    
+    function copyCode() {
+        const code = document.getElementById('codeBlock').innerText;
+        navigator.clipboard.writeText(code);
+        alert('Code copied to clipboard!');
+    }
+    
+    let lessonProgress = 0;
+    
+    function updateProgress(amount) {
+        lessonProgress = Math.min(lessonProgress + amount, 100);
+        document.getElementById('progressFill').style.width = lessonProgress + '%';
+        document.getElementById('progressPercent').innerText = lessonProgress + '%';
+    }
+    
+    function completeLesson() {
+        fetch('{% url "complete_lesson" lesson.id %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            }
+        });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadQuiz();
+        if (typeof hljs !== 'undefined') {
+            hljs.highlightAll();
+        }
+    });
+</script>
+{% endblock %}
