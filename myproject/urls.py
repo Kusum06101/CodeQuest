@@ -84,6 +84,7 @@ def load_all_data(request):
             <p><a href="/learn/">View all courses →</a></p>
             <p><a href="/debug/count/">Check counts →</a></p>
             <p><a href="/add-more-data/?key=kushi_rishu_060910">Add more data (quizzes, lessons, challenges, users) →</a></p>
+            <p><a href="/add-english-course/?key=kushi_rishu_060910">🎙️ Add Spoken English Course →</a></p>
         </body>
         </html>
         """
@@ -114,6 +115,8 @@ def debug_count(request):
         <a href="/learn/">View courses →</a>
         <br><br>
         <a href="/add-more-data/?key=kushi_rishu_060910">Add more data (quizzes, lessons, challenges, users) →</a>
+        <br>
+        <a href="/add-english-course/?key=kushi_rishu_060910">🎙️ Add Spoken English Course →</a>
     </body>
     </html>
     """)
@@ -161,11 +164,64 @@ def add_more_data(request):
         </html>
         """, status=500)
 
+def add_english_course(request):
+    """Visit this URL to add the complete Spoken English course"""
+    SECRET_KEY = "kushi_rishu_060910"
+    
+    # Only allow if secret key matches
+    if request.GET.get('key') != SECRET_KEY:
+        return HttpResponse("Access denied. Invalid or missing secret key.", status=403)
+    
+    try:
+        # Run the add_english_course.py script
+        result = subprocess.run(['python', 'add_english_course.py'], capture_output=True, text=True, cwd='/opt/render/project/src')
+        
+        output = result.stdout
+        error = result.stderr
+        
+        response_html = f"""
+        <html>
+        <head><title>Add Spoken English Course</title>
+        <style>
+            body {{ font-family: Arial, sans-serif; padding: 20px; background: #0a0a2a; color: white; }}
+            pre {{ background: #1a1a3a; padding: 15px; border-radius: 10px; overflow-x: auto; }}
+            h1 {{ color: #00e5ff; }}
+            .success {{ color: #00ff00; }}
+            .error {{ color: #ff4444; }}
+        </style>
+        </head>
+        <body style="font-family: Arial; padding: 20px; background: #0a0a2a; color: white;">
+            <h1>🎙️ Adding Spoken English Course to CodeQuest</h1>
+            <h2>Output:</h2>
+            <pre style="background: #1a1a3a; padding: 15px; border-radius: 10px; overflow-x: auto;">{output}</pre>
+            {f'<h2 style="color: #ff4444;">Errors:</h2><pre style="background: #330000; padding: 15px; border-radius: 10px; overflow-x: auto;">{error}</pre>' if error else ''}
+            <hr>
+            <p><a href="/debug/count/" style="color: #00e5ff;">Check updated counts →</a></p>
+            <p><a href="/learn/spoken-english-mastery/" style="color: #00e5ff;">🎯 View Spoken English Course →</a></p>
+            <p><a href="/learn/" style="color: #00e5ff;">📚 View all courses →</a></p>
+        </body>
+        </html>
+        """
+        return HttpResponse(response_html)
+    except Exception as e:
+        import traceback
+        return HttpResponse(f"""
+        <html>
+        <head><title>Error</title></head>
+        <body style="font-family: Arial; padding: 20px; background: #0a0a2a; color: white;">
+            <h1 style="color: #ff4444;">❌ Error Running Script</h1>
+            <pre style="background: #1a1a3a; padding: 15px; border-radius: 10px;">{str(e)}</pre>
+            <pre style="background: #1a1a3a; padding: 15px; border-radius: 10px;">{traceback.format_exc()}</pre>
+        </body>
+        </html>
+        """, status=500)
+
 urlpatterns = [
     # Temporary data loading URLs (remove after use)
     path("load-data/", load_all_data),
     path("debug/count/", debug_count),
     path("add-more-data/", add_more_data),
+    path("add-english-course/", add_english_course),  # New URL for Spoken English course
     
     # Regular URLs
     path("admin/", admin.site.urls),
