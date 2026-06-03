@@ -9,7 +9,7 @@
     {% load static %}
     <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -279,20 +279,23 @@
         }
         
         /* Grids - Mobile Responsive */
-        .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+        .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid,
+        .learning-paths-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
         }
         
         @media (min-width: 640px) {
-            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid,
+            .learning-paths-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
         
         @media (min-width: 1024px) {
-            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid,
+            .learning-paths-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
@@ -326,6 +329,8 @@
         /* Cards */
         .learning-path-card, .language-card, .quiz-card {
             background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 229, 255, 0.2);
             border-radius: 16px;
             padding: 16px;
             transition: 0.3s;
@@ -451,6 +456,42 @@
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
         }
+        
+        /* Responsive Tables */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Fix dashboard stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+        }
+        
+        @media (max-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Fix empty state */
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+        }
+        
+        @media (max-width: 640px) {
+            .empty-state {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
     </style>
     
     {% block extra_css %}{% endblock %}
@@ -458,14 +499,17 @@
 <body>
     <script>
         function toggleMobileMenu() {
-            document.querySelector('.nav-links').classList.toggle('show');
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
         }
         
         function toggleAdminDropdown() {
-            document.querySelector('.admin-dropdown').classList.toggle('active');
+            const dropdown = document.querySelector('.admin-dropdown');
+            dropdown.classList.toggle('active');
         }
         
         document.addEventListener('DOMContentLoaded', function() {
+            // Close menu when clicking outside
             document.addEventListener('click', function(event) {
                 const navLinks = document.querySelector('.nav-links');
                 const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -475,12 +519,31 @@
                     }
                 }
             });
+            
+            // Fix for back/forward navigation
+            (function() {
+                let pageReloaded = false;
+                window.addEventListener('pageshow', function(event) {
+                    if (event.persisted && !pageReloaded) {
+                        pageReloaded = true;
+                        window.location.reload();
+                    }
+                });
+                if (window.performance) {
+                    try {
+                        const navEntries = performance.getEntriesByType('navigation');
+                        if (navEntries.length > 0 && navEntries[0].type === 'back_forward') {
+                            window.location.reload();
+                        }
+                    } catch(e) {}
+                }
+            })();
         });
     </script>
     
     <div class="loading-screen" id="loadingScreen">
         <div class="loader-spinner"></div>
-        <div class="loader-text">🚀 Launching CodeQuest...</div>
+        <div class="loader-text">Launching CodeQuest...</div>
     </div>
     
     <nav class="navbar">
@@ -585,7 +648,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2024 CodeQuest Space Academy | Make Learning an Adventure! 🚀</p>
+            <p>&copy; 2024 CodeQuest Space Academy | Make Learning an Adventure!</p>
         </div>
     </footer>
     
@@ -597,13 +660,15 @@
                 const loadingScreen = document.getElementById('loadingScreen');
                 if (loadingScreen) {
                     loadingScreen.style.opacity = '0';
-                    setTimeout(function() { loadingScreen.style.display = 'none'; }, 500);
+                    setTimeout(function() { 
+                        loadingScreen.style.display = 'none'; 
+                    }, 500);
                 }
             }, 800);
         });
     </script>
     
-    <script src="{% static 'js/main.js' %}?v=4"></script>
+    <script src="{% static 'js/main.js' %}?v=5"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
