@@ -20,7 +20,11 @@ def load_all_data(request):
         return HttpResponse("Access denied. Invalid or missing secret key.", status=403)
     
     try:
-        from base.models import LearningPath, Lesson, Challenge, ProgrammingLanguage, Quiz, QuizQuestion, QuizChoice
+        from base.models import (
+            LearningPath, Lesson, Challenge, ProgrammingLanguage, 
+            Quiz, QuizQuestion, QuizChoice, CodeSubmission, 
+            UserBadge, LearningProgress, QuizAttempt, QuizAnswer
+        )
         
         # Show current counts before deletion
         initial_courses = LearningPath.objects.count()
@@ -28,14 +32,20 @@ def load_all_data(request):
         initial_challenges = Challenge.objects.count()
         initial_languages = ProgrammingLanguage.objects.count()
         
-        # Clear existing data (except users)
-        ProgrammingLanguage.objects.all().delete()
-        LearningPath.objects.all().delete()
-        Lesson.objects.all().delete()
-        Challenge.objects.all().delete()
-        Quiz.objects.all().delete()
-        QuizQuestion.objects.all().delete()
+        # Delete in correct order (child tables first, then parent tables)
+        # This avoids foreign key constraint errors
+        CodeSubmission.objects.all().delete()
+        UserBadge.objects.all().delete()
+        LearningProgress.objects.all().delete()
+        QuizAnswer.objects.all().delete()
+        QuizAttempt.objects.all().delete()
         QuizChoice.objects.all().delete()
+        QuizQuestion.objects.all().delete()
+        Quiz.objects.all().delete()
+        Challenge.objects.all().delete()
+        Lesson.objects.all().delete()
+        LearningPath.objects.all().delete()
+        ProgrammingLanguage.objects.all().delete()
         
         # Load the data fresh
         call_command('loaddata', 'complete_data.json', verbosity=2)
