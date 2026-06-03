@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.http import HttpResponse
 from django.core.management import call_command
+import subprocess
 
 # Data loading view (temporary - remove after use)
 def load_all_data(request):
@@ -24,7 +25,7 @@ def load_all_data(request):
             LearningPath, Lesson, Challenge, ProgrammingLanguage, 
             Quiz, QuizQuestion, QuizChoice, CodeSubmission, 
             UserBadge, LearningProgress, QuizAttempt, QuizAnswer,
-            Badge  # Add this
+            Badge
         )
         
         # Show current counts before deletion
@@ -47,7 +48,7 @@ def load_all_data(request):
         Challenge.objects.all().delete()
         Lesson.objects.all().delete()
         LearningPath.objects.all().delete()
-        Badge.objects.all().delete()  # Add this
+        Badge.objects.all().delete()
         ProgrammingLanguage.objects.all().delete()
         
         # Load the data fresh
@@ -82,6 +83,7 @@ def load_all_data(request):
             <hr>
             <p><a href="/learn/">View all courses →</a></p>
             <p><a href="/debug/count/">Check counts →</a></p>
+            <p><a href="/add-more-data/?key=kushi_rishu_060910">Add more data (quizzes, lessons, challenges, users) →</a></p>
         </body>
         </html>
         """
@@ -110,14 +112,60 @@ def debug_count(request):
         <p><strong>Lessons:</strong> {Lesson.objects.count()}</p>
         <p><strong>Challenges:</strong> {Challenge.objects.count()}</p>
         <a href="/learn/">View courses →</a>
+        <br><br>
+        <a href="/add-more-data/?key=kushi_rishu_060910">Add more data (quizzes, lessons, challenges, users) →</a>
     </body>
     </html>
     """)
+
+def add_more_data(request):
+    """Visit this URL to add quizzes, more lessons, course challenges, and dummy users"""
+    SECRET_KEY = "kushi_rishu_060910"
+    
+    # Only allow if secret key matches
+    if request.GET.get('key') != SECRET_KEY:
+        return HttpResponse("Access denied. Invalid or missing secret key.", status=403)
+    
+    try:
+        # Run the add_more_data.py script
+        result = subprocess.run(['python', 'add_more_data.py'], capture_output=True, text=True, cwd='/opt/render/project/src')
+        
+        output = result.stdout
+        error = result.stderr
+        
+        response_html = f"""
+        <html>
+        <head><title>Add More Data</title></head>
+        <body style="font-family: Arial; padding: 20px;">
+            <h1>📊 Adding More Data to CodeQuest</h1>
+            <h2>Output:</h2>
+            <pre style="background: #f0f0f0; padding: 15px; overflow-x: auto;">{output}</pre>
+            {f'<h2 style="color: red;">Errors:</h2><pre style="background: #ffeeee; padding: 15px; overflow-x: auto;">{error}</pre>' if error else ''}
+            <hr>
+            <p><a href="/debug/count/">Check updated counts →</a></p>
+            <p><a href="/learn/">View all courses →</a></p>
+        </body>
+        </html>
+        """
+        return HttpResponse(response_html)
+    except Exception as e:
+        import traceback
+        return HttpResponse(f"""
+        <html>
+        <head><title>Error</title></head>
+        <body style="font-family: Arial; padding: 20px;">
+            <h1>❌ Error Running Script</h1>
+            <pre>{str(e)}</pre>
+            <pre>{traceback.format_exc()}</pre>
+        </body>
+        </html>
+        """, status=500)
 
 urlpatterns = [
     # Temporary data loading URLs (remove after use)
     path("load-data/", load_all_data),
     path("debug/count/", debug_count),
+    path("add-more-data/", add_more_data),
     
     # Regular URLs
     path("admin/", admin.site.urls),
