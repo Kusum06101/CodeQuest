@@ -876,6 +876,27 @@ class PublicQuizListView(ListView):
 
 
 # ============================================
+# ALL QUIZZES VIEW (Shows all quizzes)
+# ============================================
+
+class AllQuizzesListView(ListView):
+    """Show all quizzes in one page - accessible to everyone"""
+    model = Quiz
+    template_name = "base/all_quizzes.html"
+    context_object_name = "quizzes"
+    paginate_by = 20
+    
+    def get_queryset(self):
+        return Quiz.objects.filter(is_active=True).select_related('lesson', 'lesson__learning_path').order_by('lesson__learning_path__title', 'title')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = "All Quizzes"
+        context['total_quizzes'] = self.get_queryset().count()
+        return context
+
+
+# ============================================
 # SIMPLE VIEWS FOR DEBUGGING
 # ============================================
 

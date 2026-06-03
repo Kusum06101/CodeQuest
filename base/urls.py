@@ -98,6 +98,7 @@ urlpatterns = [
     path("quiz/<uuid:quiz_id>/", views.TakeQuizView.as_view(), name="take_quiz"),
     path("quiz/result/<uuid:attempt_id>/", views.QuizResultView.as_view(), name="quiz_result"),
     path("quizzes/", views.PublicQuizListView.as_view(), name="quizzes"),
+    path("all-quizzes/", views.AllQuizzesListView.as_view(), name="all_quizzes"),  # NEW: Show all quizzes
     
     # ============================================
     # CHALLENGES
