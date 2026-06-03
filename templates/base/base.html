@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
     
     <!-- Strong Cache Control - Prevent any caching -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, private">
@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- CSS - Add version parameter to force reload -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=2">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=3">
     
     <!-- Code Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
@@ -44,10 +44,22 @@
             overflow-x: hidden;
         }
         
-        /* Navbar Styles */
+        /* Mobile Menu Button - Hidden on desktop */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1001;
+        }
+        
+        /* Navbar Styles - Mobile First */
         .navbar {
             background: linear-gradient(135deg, #0a0a2a 0%, #1a1a3e 100%);
-            padding: 1rem 2rem;
+            padding: 0.8rem 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -56,24 +68,16 @@
             top: 0;
             z-index: 1000;
             flex-wrap: wrap;
-            gap: 15px;
         }
         
-        /* RESTORED LOGO STYLES - White color with glow */
         .nav-brand a {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: white;
             text-decoration: none;
             font-family: 'Orbitron', monospace;
-            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5), 0 0 20px rgba(176, 38, 255, 0.3);
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
             transition: all 0.3s ease;
-            letter-spacing: 1px;
-        }
-        
-        .nav-brand a:hover {
-            text-shadow: 0 0 15px rgba(0, 229, 255, 0.8), 0 0 25px rgba(176, 38, 255, 0.5);
-            transform: scale(1.02);
         }
         
         .nav-links {
@@ -83,19 +87,61 @@
             flex-wrap: wrap;
         }
         
-        .nav-links a {
-            color: white;
+        .nav-links a, .nav-links button, .logout-btn {
             text-decoration: none;
+            color: white;
             transition: all 0.3s;
             font-weight: 500;
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 14px;
+            background: rgba(255, 255, 255, 0.05);
         }
         
-        .nav-links a:hover {
-            color: #00e5ff;
-            background: rgba(0, 229, 255, 0.1);
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 0.5rem;
+                margin-top: 1rem;
+                max-height: 70vh;
+                overflow-y: auto;
+            }
+            
+            .nav-links.show {
+                display: flex;
+            }
+            
+            .nav-links a, .nav-links button, .logout-btn {
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+            }
+            
+            .admin-dropdown {
+                width: 100%;
+            }
+            
+            .admin-dropdown-content {
+                position: static;
+                width: 100%;
+                margin-top: 0.5rem;
+                box-shadow: none;
+                background: rgba(255, 255, 255, 0.05);
+            }
+            
+            .admin-toggle {
+                display: block;
+                width: 100%;
+                text-align: center;
+                padding: 12px;
+            }
         }
         
         /* Admin Dropdown Styles */
@@ -114,11 +160,6 @@
             border-radius: 8px;
         }
         
-        .admin-toggle:hover {
-            color: #ffed4e;
-            background: rgba(255, 217, 61, 0.1);
-        }
-        
         .admin-dropdown-content {
             display: none;
             position: absolute;
@@ -132,29 +173,31 @@
             border: 1px solid rgba(0, 229, 255, 0.2);
         }
         
-        .admin-dropdown-content a {
-            color: white !important;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        
-        .admin-dropdown-content a:hover {
-            background: rgba(102, 126, 234, 0.3);
-            color: #00e5ff !important;
-        }
-        
         .admin-dropdown:hover .admin-dropdown-content {
             display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .admin-dropdown-content {
+                position: static;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            
+            .admin-dropdown:hover .admin-dropdown-content {
+                display: none;
+            }
+            
+            .admin-dropdown.active .admin-dropdown-content {
+                display: block;
+            }
         }
         
         .logout-form {
             display: inline;
         }
         
-        .nav-logout {
+        .nav-logout, .logout-btn {
             background: linear-gradient(135deg, #dc3545, #c82333);
             color: white;
             border: none;
@@ -165,101 +208,26 @@
             transition: transform 0.2s;
         }
         
-        .nav-logout:hover {
-            transform: scale(1.05);
-        }
-        
-        /* Quick Add Button Styles */
-        .floating-add-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .floating-add-btn:hover {
-            transform: scale(1.1) rotate(90deg);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
-        }
-        
-        .floating-add-btn i {
-            font-size: 28px;
-        }
-        
-        /* Admin Action Bar */
-        .admin-action-bar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .admin-action-bar h3 {
-            margin: 0;
-            color: white;
-            font-size: 1.2rem;
-        }
-        
-        .quick-add-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-quick-add {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-        
-        .btn-quick-add:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-        
-        .btn-quick-add i {
-            margin-right: 5px;
-        }
-        
-        /* XP Bar Styles */
+        /* XP Bar - Mobile Responsive */
         .xp-bar-container {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
-            padding: 10px 20px;
+            padding: 8px 12px;
             border-bottom: 1px solid rgba(0, 229, 255, 0.2);
         }
         
         .xp-bar-wrapper {
             max-width: 1200px;
             margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
         
         .xp-bar-info {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 14px;
+            gap: 15px;
+            font-size: 12px;
         }
         
         .xp-level {
@@ -272,10 +240,12 @@
         }
         
         .xp-bar-track {
+            flex: 1;
             background: rgba(255,255,255,0.1);
             border-radius: 10px;
             height: 8px;
             overflow: hidden;
+            min-width: 100px;
         }
         
         .xp-bar-fill {
@@ -286,40 +256,43 @@
         }
         
         .xp-next-level {
-            font-size: 12px;
+            font-size: 10px;
             color: #9ca3af;
-            margin-top: 5px;
-            text-align: right;
+        }
+        
+        @media (max-width: 768px) {
+            .xp-bar-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .xp-bar-info {
+                justify-content: space-between;
+            }
+            
+            .xp-next-level {
+                text-align: center;
+            }
         }
         
         /* Messages */
         .messages {
             position: fixed;
-            top: 80px;
-            right: 20px;
+            top: 70px;
+            right: 10px;
+            left: 10px;
             z-index: 1100;
+            max-width: 400px;
+            margin: 0 auto;
         }
         
         .message {
-            padding: 12px 20px;
+            padding: 12px 16px;
             border-radius: 10px;
             margin-bottom: 10px;
             animation: slideIn 0.3s ease;
-        }
-        
-        .message.success {
-            background: linear-gradient(135deg, #28a745, #20c997);
-            color: white;
-        }
-        
-        .message.error {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-        }
-        
-        .message.warning {
-            background: linear-gradient(135deg, #ffc107, #e0a800);
-            color: #333;
+            font-size: 14px;
         }
         
         @keyframes slideIn {
@@ -333,12 +306,12 @@
             }
         }
         
-        /* Footer */
+        /* Footer - Mobile Responsive */
         .site-footer {
             background: linear-gradient(135deg, #0a0a2a, #0f0f23);
             color: white;
-            padding: 40px 20px 20px;
-            margin-top: 50px;
+            padding: 30px 15px 20px;
+            margin-top: 40px;
             border-top: 1px solid rgba(0, 229, 255, 0.2);
         }
         
@@ -347,33 +320,113 @@
             margin: 0 auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
+            gap: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 20px;
+            }
         }
         
         .footer-section h4 {
             color: #00e5ff;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
+            font-size: 1rem;
         }
         
         .footer-section a {
             color: #d1d5db;
             text-decoration: none;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             transition: color 0.3s;
-        }
-        
-        .footer-section a:hover {
-            color: #00e5ff;
+            font-size: 13px;
         }
         
         .footer-bottom {
             text-align: center;
-            padding-top: 30px;
-            margin-top: 30px;
+            padding-top: 20px;
+            margin-top: 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 14px;
+            font-size: 12px;
             color: #9ca3af;
+        }
+        
+        /* Page Content - Mobile Padding */
+        .page {
+            min-height: calc(100vh - 200px);
+            padding: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .page {
+                padding: 20px;
+            }
+        }
+        
+        /* Grid Layouts - Mobile Responsive */
+        .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        @media (max-width: 640px) {
+            .languages-grid, .paths-grid, .quizzes-grid, .challenges-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        /* Hero Section - Mobile */
+        .hero-section {
+            padding: 30px 15px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 1.8rem;
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-description {
+                font-size: 0.9rem;
+            }
+            
+            .hero-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+        }
+        
+        /* Cards */
+        .learning-path-card, .language-card, .quiz-card {
+            padding: 15px;
+        }
+        
+        /* Buttons */
+        button, .btn, input[type="submit"] {
+            padding: 10px 18px;
+            font-size: 13px;
+        }
+        
+        /* Forms */
+        input, select, textarea {
+            font-size: 16px; /* Prevents zoom on mobile */
+        }
+        
+        /* Tables - Horizontal Scroll */
+        .table-responsive {
+            overflow-x: auto;
+            display: block;
+            width: 100%;
         }
         
         /* Loading Screen */
@@ -389,61 +442,44 @@
             justify-content: center;
             align-items: center;
             z-index: 10000;
-            transition: opacity 0.5s ease;
         }
         
         .loader-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(0, 229, 255, 0.3);
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 229, 255, 0.3);
             border-top-color: #00e5ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+        
+        .loader-text {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-family: 'Orbitron', monospace;
         }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        .loader-text {
-            margin-top: 20px;
-            font-size: 1.5rem;
-            font-family: 'Orbitron', monospace;
-            background: linear-gradient(135deg, #00e5ff, #b026ff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .loader-subtitle {
-            margin-top: 10px;
-            color: #9ca3af;
-        }
-        
-        /* Sound and Particles Toggles */
-        .sound-toggle, .particles-toggle {
+        /* Floating Buttons Mobile */
+        .floating-add-btn {
             position: fixed;
             bottom: 20px;
-            left: 20px;
-            width: 40px;
-            height: 40px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 1000;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-            transition: transform 0.2s;
-        }
-        
-        .particles-toggle {
-            left: 70px;
-        }
-        
-        .sound-toggle:hover, .particles-toggle:hover {
-            transform: scale(1.1);
         }
         
         .galaxy {
@@ -457,44 +493,59 @@
             background: radial-gradient(ellipse at center, #0a0a2a 0%, #000000 100%);
         }
         
-        .page {
-            min-height: calc(100vh - 200px);
-            padding: 20px;
+        /* Sound toggles mobile */
+        .sound-toggle, .particles-toggle {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            font-size: 16px;
         }
         
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                padding: 1rem;
-            }
-            
-            .nav-links {
-                justify-content: center;
-            }
-            
-            .nav-links a {
-                padding: 6px 10px;
-                font-size: 12px;
-            }
-            
-            .admin-dropdown-content {
-                right: auto;
-                left: 0;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
+        .particles-toggle {
+            left: 65px;
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <!-- Fix back/forward navigation -->
+    <!-- Mobile Menu Toggle Script -->
     <script>
+        function toggleMobileMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('show');
+        }
+        
+        function toggleAdminDropdown() {
+            const dropdown = document.querySelector('.admin-dropdown');
+            dropdown.classList.toggle('active');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const navLinks = document.querySelector('.nav-links');
+                const menuBtn = document.querySelector('.mobile-menu-btn');
+                if (navLinks && navLinks.classList.contains('show')) {
+                    if (!navLinks.contains(event.target) && !menuBtn.contains(event.target)) {
+                        navLinks.classList.remove('show');
+                    }
+                }
+            });
+            
+            if (typeof hljs !== 'undefined') hljs.highlightAll();
+        });
+        
+        // Fix back/forward navigation
         (function() {
             let pageReloaded = false;
             window.addEventListener('pageshow', function(event) {
@@ -511,9 +562,6 @@
                     }
                 } catch(e) {}
             }
-            if (window.history.replaceState) {
-                window.history.replaceState(null, null, window.location.href);
-            }
         })();
     </script>
     
@@ -524,15 +572,16 @@
         <div class="loader-subtitle">Preparing your learning adventure</div>
     </div>
     
-    <!-- Navbar with ALL Navigation Tabs -->
+    <!-- Navbar -->
     <nav class="navbar">
         <div class="nav-brand">
-            <a href="{% url 'home' %}">CodeQuest</a>
+            <a href="{% url 'home' %}">🚀 CodeQuest</a>
         </div>
+        
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
     
         <div class="nav-links">
             {% if user.is_authenticated %}
-                <!-- Main Navigation Tabs - ALL VISIBLE -->
                 <a href="{% url 'home' %}">🏠 Home</a>
                 <a href="{% url 'learning_paths' %}">📚 Learning Paths</a>
                 <a href="{% url 'challenges' %}">💻 Challenges</a>
@@ -543,10 +592,9 @@
                 <a href="/realtime/">🔴 Live Learning</a>
                 <a href="{% url 'search' %}">🔍 Search</a>
                 
-                <!-- Admin Links (only for staff users) -->
                 {% if user.is_staff %}
                     <div class="admin-dropdown">
-                        <span class="admin-toggle">🔧 Admin ▼</span>
+                        <span class="admin-toggle" onclick="toggleAdminDropdown()">🔧 Admin ▼</span>
                         <div class="admin-dropdown-content">
                             <a href="{% url 'learning-path-list' %}">🛤️ Manage Paths</a>
                             <a href="{% url 'challenge-list' %}">💪 Manage Challenges</a>
@@ -568,30 +616,6 @@
             {% endif %}
         </div>
     </nav>
-    
-    <!-- Admin Action Bar (Only for staff users) -->
-    {% if user.is_authenticated and user.is_staff %}
-    <div class="admin-action-bar" style="margin: 20px;">
-        <h3><i class="fas fa-crown"></i> Admin Quick Actions</h3>
-        <div class="quick-add-buttons">
-            <button class="btn-quick-add" onclick="openCreateModal('learning-path')">
-                <i class="fas fa-road"></i> New Learning Path
-            </button>
-            <button class="btn-quick-add" onclick="openCreateModal('lesson')">
-                <i class="fas fa-book"></i> New Lesson
-            </button>
-            <button class="btn-quick-add" onclick="openCreateModal('challenge')">
-                <i class="fas fa-code"></i> New Challenge
-            </button>
-            <button class="btn-quick-add" onclick="openCreateModal('quiz')">
-                <i class="fas fa-tasks"></i> New Quiz
-            </button>
-            <button class="btn-quick-add" onclick="openCreateModal('language')">
-                <i class="fas fa-language"></i> New Language
-            </button>
-        </div>
-    </div>
-    {% endif %}
     
     <!-- XP Bar (shown when logged in) -->
     {% if user.is_authenticated %}
@@ -623,7 +647,6 @@
     <!-- Main Content -->
     <main class="page">
         {% block content %}
-        <!-- Default content block -->
         <div style="text-align: center; padding: 50px;">
             <h1 style="color: white;">Welcome to CodeQuest!</h1>
             <p style="color: #d1d5db;">Start your coding journey today.</p>
@@ -637,14 +660,12 @@
             <div class="footer-section">
                 <h4>🚀 CodeQuest</h4>
                 <p>Learn programming through gamified space adventures</p>
-                <p>Master coding with interactive lessons and real-time quizzes</p>
             </div>
             <div class="footer-section">
                 <h4>📚 Quick Links</h4>
                 <a href="{% url 'learning_paths' %}">📚 Learning Paths</a>
                 <a href="{% url 'leaderboard' %}">🏆 Leaderboard</a>
                 <a href="{% url 'dashboard' %}">📊 Dashboard</a>
-                <a href="/realtime/">🔴 Live Learning</a>
                 {% if not user.is_authenticated %}
                     <a href="{% url 'register' %}">✨ Sign Up</a>
                 {% endif %}
@@ -653,15 +674,11 @@
                 <h4>💻 Languages</h4>
                 <a href="{% url 'learning_paths' %}?language=1">🐍 Python</a>
                 <a href="{% url 'learning_paths' %}?language=2">📜 JavaScript</a>
-                <a href="{% url 'learning_paths' %}?language=3">☕ Java</a>
-                <a href="{% url 'learning_paths' %}?language=4">🎨 HTML/CSS</a>
             </div>
             <div class="footer-section">
                 <h4>🌌 Connect</h4>
-                <a href="#">💬 Discord Community</a>
+                <a href="#">💬 Discord</a>
                 <a href="#">🐙 GitHub</a>
-                <a href="#">🐦 Twitter</a>
-                <a href="#">📧 Contact Us</a>
             </div>
         </div>
         <div class="footer-bottom">
@@ -669,416 +686,24 @@
         </div>
     </footer>
     
-    <!-- Floating Add Button (Only for staff users) -->
-    {% if user.is_authenticated and user.is_staff %}
-    <button class="floating-add-btn" onclick="openQuickAddMenu()" id="floatingAddBtn">
-        <i class="fas fa-plus"></i>
-    </button>
+    <div class="galaxy"></div>
     
-    <!-- Quick Add Menu -->
-    <div id="quickAddMenu" style="display: none; position: fixed; bottom: 100px; right: 30px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 15px; padding: 15px; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.3); min-width: 200px;">
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-            <button onclick="openCreateModal('learning-path')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
-                <i class="fas fa-road"></i> New Learning Path
-            </button>
-            <button onclick="openCreateModal('lesson')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
-                <i class="fas fa-book"></i> New Lesson
-            </button>
-            <button onclick="openCreateModal('challenge')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
-                <i class="fas fa-code"></i> New Challenge
-            </button>
-            <button onclick="openCreateModal('quiz')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
-                <i class="fas fa-tasks"></i> New Quiz
-            </button>
-            <button onclick="openCreateModal('language')" style="background: none; border: none; color: white; padding: 10px; text-align: left; cursor: pointer; border-radius: 8px;">
-                <i class="fas fa-language"></i> New Language
-            </button>
-        </div>
-    </div>
-    {% endif %}
+    <script src="{% static 'js/main.js' %}?v=3"></script>
+    {% block extra_js %}{% endblock %}
     
-    <!-- Create Modal -->
-    <div id="createModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Create New</h2>
-                <button class="close-modal" onclick="closeCreateModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="createForm" method="post">
-                    {% csrf_token %}
-                    <div id="formFields">
-                        <!-- Dynamic form fields will be loaded here -->
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-cancel" onclick="closeCreateModal()">Cancel</button>
-                <button class="btn-submit" onclick="submitCreateForm()">Create</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Sound Toggles -->
-    <div class="sound-toggle" data-tooltip="Toggle Sound">🔊</div>
-    <div class="particles-toggle" data-tooltip="Toggle Particles">✨</div>
-    
-    <!-- JavaScript -->
-    <script src="{% static 'js/main.js' %}?v=2"></script>
     <script>
-        // ============================================
-        // QUICK ADD FUNCTIONALITY
-        // ============================================
-        
-        let currentModalType = null;
-        
-        function openQuickAddMenu() {
-            const menu = document.getElementById('quickAddMenu');
-            if (menu.style.display === 'none' || menu.style.display === '') {
-                menu.style.display = 'block';
-                setTimeout(() => {
-                    document.addEventListener('click', closeQuickAddMenuOnClickOutside);
-                }, 100);
-            } else {
-                menu.style.display = 'none';
-                document.removeEventListener('click', closeQuickAddMenuOnClickOutside);
-            }
-        }
-        
-        function closeQuickAddMenuOnClickOutside(e) {
-            const menu = document.getElementById('quickAddMenu');
-            const btn = document.getElementById('floatingAddBtn');
-            if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                menu.style.display = 'none';
-                document.removeEventListener('click', closeQuickAddMenuOnClickOutside);
-            }
-        }
-        
-        async function openCreateModal(type) {
-            currentModalType = type;
-            const modal = document.getElementById('createModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const formFields = document.getElementById('formFields');
-            
-            const titles = {
-                'learning-path': 'Create New Learning Path',
-                'lesson': 'Create New Lesson',
-                'challenge': 'Create New Challenge',
-                'quiz': 'Create New Quiz',
-                'language': 'Create New Programming Language'
-            };
-            modalTitle.textContent = titles[type] || 'Create New';
-            
-            let fieldsHtml = '';
-            
-            switch(type) {
-                case 'learning-path':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" name="title" required placeholder="e.g., Python Mastery">
-                        </div>
-                        <div class="form-group">
-                            <label>Slug *</label>
-                            <input type="text" name="slug" required placeholder="e.g., python-mastery">
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea name="description" rows="3" placeholder="Describe this learning path..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Language</label>
-                            <select name="language">
-                                <option value="">Select Language</option>
-                                ${await getLanguages()}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Difficulty Level</label>
-                            <select name="difficulty">
-                                <option value="BEGINNER">Beginner</option>
-                                <option value="INTERMEDIATE">Intermediate</option>
-                                <option value="ADVANCED">Advanced</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'lesson':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" name="title" required placeholder="e.g., Introduction to Variables">
-                        </div>
-                        <div class="form-group">
-                            <label>Slug *</label>
-                            <input type="text" name="slug" required placeholder="e.g., introduction-to-variables">
-                        </div>
-                        <div class="form-group">
-                            <label>Learning Path</label>
-                            <select name="learning_path">
-                                <option value="">Select Learning Path</option>
-                                ${await getLearningPaths()}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Theory Content</label>
-                            <textarea name="theory_content" rows="5" placeholder="Lesson content..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Example Code</label>
-                            <textarea name="example_code" rows="3" placeholder="Code examples..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Order</label>
-                            <input type="number" name="order" value="0">
-                        </div>
-                        <div class="form-group">
-                            <label>XP Reward</label>
-                            <input type="number" name="xp_reward" value="10">
-                        </div>
-                    `;
-                    break;
-                    
-                case 'challenge':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" name="title" required placeholder="e.g., Reverse a String">
-                        </div>
-                        <div class="form-group">
-                            <label>Slug *</label>
-                            <input type="text" name="slug" required placeholder="e.g., reverse-a-string">
-                        </div>
-                        <div class="form-group">
-                            <label>Problem Statement</label>
-                            <textarea name="problem_statement" rows="3" placeholder="Challenge description..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Language</label>
-                            <select name="language">
-                                <option value="">Select Language</option>
-                                ${await getLanguages()}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Difficulty</label>
-                            <select name="difficulty">
-                                <option value="EASY">Easy</option>
-                                <option value="MEDIUM">Medium</option>
-                                <option value="HARD">Hard</option>
-                            </select>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'quiz':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Title *</label>
-                            <input type="text" name="title" required placeholder="Quiz Title">
-                        </div>
-                        <div class="form-group">
-                            <label>Lesson</label>
-                            <select name="lesson">
-                                <option value="">Select Lesson</option>
-                                ${await getLessons()}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Passing Score (%)</label>
-                            <input type="number" name="passing_score" value="70" min="0" max="100">
-                        </div>
-                        <div class="form-group">
-                            <label>XP Reward</label>
-                            <input type="number" name="xp_reward" value="20">
-                        </div>
-                    `;
-                    break;
-                    
-                case 'language':
-                    fieldsHtml = `
-                        <div class="form-group">
-                            <label>Name *</label>
-                            <input type="text" name="name" required placeholder="e.g., Python">
-                        </div>
-                        <div class="form-group">
-                            <label>Slug *</label>
-                            <input type="text" name="slug" required placeholder="e.g., python">
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea name="description" rows="2" placeholder="Language description..."></textarea>
-                        </div>
-                    `;
-                    break;
-            }
-            
-            formFields.innerHTML = fieldsHtml;
-            modal.style.display = 'block';
-        }
-        
-        async function getLanguages() {
-            try {
-                const response = await fetch('/api/languages/');
-                const languages = await response.json();
-                return languages.map(lang => `<option value="${lang.id}">${lang.name}</option>`).join('');
-            } catch(e) {
-                return '';
-            }
-        }
-        
-        async function getLearningPaths() {
-            try {
-                const response = await fetch('/api/learning-paths/');
-                const paths = await response.json();
-                return paths.map(path => `<option value="${path.id}">${path.title}</option>`).join('');
-            } catch(e) {
-                return '';
-            }
-        }
-        
-        async function getLessons() {
-            try {
-                const response = await fetch('/api/lessons/');
-                const lessons = await response.json();
-                return lessons.map(lesson => `<option value="${lesson.id}">${lesson.title}</option>`).join('');
-            } catch(e) {
-                return '';
-            }
-        }
-        
-        async function submitCreateForm() {
-            const form = document.getElementById('createForm');
-            const formData = new FormData(form);
-            const data = {};
-            
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            let endpoint = '';
-            let redirectUrl = '';
-            
-            switch(currentModalType) {
-                case 'learning-path':
-                    endpoint = '/api/learning-paths/';
-                    redirectUrl = '/learn/';
-                    break;
-                case 'lesson':
-                    endpoint = '/api/lessons/';
-                    redirectUrl = '/learn/';
-                    break;
-                case 'challenge':
-                    endpoint = '/api/challenges/';
-                    redirectUrl = '/challenges/';
-                    break;
-                case 'quiz':
-                    endpoint = '/api/quizzes/';
-                    redirectUrl = '/quizzes/';
-                    break;
-                case 'language':
-                    endpoint = '/api/languages/';
-                    redirectUrl = '/learn/';
-                    break;
-            }
-            
-            try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (response.ok) {
-                    showToast('Created successfully! 🎉');
-                    setTimeout(() => {
-                        window.location.href = redirectUrl;
-                    }, 1500);
-                } else {
-                    const error = await response.json();
-                    showToast('Error: ' + JSON.stringify(error), 'error');
-                }
-            } catch(e) {
-                showToast('Error creating item: ' + e.message, 'error');
-            }
-        }
-        
-        function closeCreateModal() {
-            document.getElementById('createModal').style.display = 'none';
-            currentModalType = null;
-        }
-        
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-        
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-        
-        window.onclick = function(event) {
-            const modal = document.getElementById('createModal');
-            if (event.target === modal) closeCreateModal();
-        }
-        
         // Hide loading screen
-        window.addEventListener('pageshow', function() {
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen && loadingScreen.style.display !== 'none') {
-                loadingScreen.style.display = 'none';
-            }
-        });
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof hljs !== 'undefined') hljs.highlightAll();
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                setTimeout(function() { loadingScreen.style.display = 'none'; }, 100);
-            }
-        });
-        
         window.addEventListener('load', function() {
             setTimeout(function() {
                 const loadingScreen = document.getElementById('loadingScreen');
                 if (loadingScreen) {
-                    loadingScreen.style.transition = 'opacity 0.5s ease';
                     loadingScreen.style.opacity = '0';
-                    setTimeout(function() { loadingScreen.style.display = 'none'; }, 500);
+                    setTimeout(function() { 
+                        loadingScreen.style.display = 'none'; 
+                    }, 500);
                 }
             }, 800);
         });
-        
-        const galaxyDiv = document.createElement('div');
-        galaxyDiv.className = 'galaxy';
-        if (document.body.firstChild) {
-            document.body.insertBefore(galaxyDiv, document.body.firstChild);
-        } else {
-            document.body.appendChild(galaxyDiv);
-        }
-        
-        console.log('%c🚀 Welcome to CodeQuest Space Academy! 🚀', 'color: #00e5ff; font-size: 16px; font-weight: bold; font-family: monospace;');
-        console.log('%c🌌 Your coding journey through the galaxy begins here! 🌌', 'color: #b026ff; font-size: 14px; font-family: monospace;');
-        console.log('%c✨ Navigation tabs: Home, Learning Paths, Challenges, Quizzes, Leaderboard, Dashboard, Profile, Live Learning, Search ✨', 'color: #ffd93d; font-size: 12px; font-family: monospace;');
     </script>
-    {% block extra_js %}{% endblock %}
 </body>
 </html>
