@@ -20,17 +20,30 @@ def load_all_data(request):
         return HttpResponse("Access denied. Invalid or missing secret key.", status=403)
     
     try:
-        from base.models import LearningPath, ProgrammingLanguage
+        from base.models import LearningPath, Lesson, Challenge, ProgrammingLanguage, Quiz, QuizQuestion, QuizChoice
         
-        # Show current counts
+        # Show current counts before deletion
         initial_courses = LearningPath.objects.count()
-        initial_langs = ProgrammingLanguage.objects.count()
+        initial_lessons = Lesson.objects.count()
+        initial_challenges = Challenge.objects.count()
+        initial_languages = ProgrammingLanguage.objects.count()
         
-        # Load the data - IGNORE existing records
-        call_command('loaddata', 'complete_data.json', verbosity=2, ignorenonexistent=True)
+        # Clear existing data (except users)
+        ProgrammingLanguage.objects.all().delete()
+        LearningPath.objects.all().delete()
+        Lesson.objects.all().delete()
+        Challenge.objects.all().delete()
+        Quiz.objects.all().delete()
+        QuizQuestion.objects.all().delete()
+        QuizChoice.objects.all().delete()
+        
+        # Load the data fresh
+        call_command('loaddata', 'complete_data.json', verbosity=2)
         
         final_courses = LearningPath.objects.count()
-        final_langs = ProgrammingLanguage.objects.count()
+        final_lessons = Lesson.objects.count()
+        final_challenges = Challenge.objects.count()
+        final_languages = ProgrammingLanguage.objects.count()
         
         response = f"""
         <html>
@@ -40,11 +53,15 @@ def load_all_data(request):
             <h2>Courses:</h2>
             <p><strong>Before:</strong> {initial_courses}</p>
             <p><strong>After:</strong> {final_courses}</p>
-            <p><strong>Added:</strong> {final_courses - initial_courses}</p>
+            <h2>Lessons:</h2>
+            <p><strong>Before:</strong> {initial_lessons}</p>
+            <p><strong>After:</strong> {final_lessons}</p>
+            <h2>Challenges:</h2>
+            <p><strong>Before:</strong> {initial_challenges}</p>
+            <p><strong>After:</strong> {final_challenges}</p>
             <h2>Languages:</h2>
-            <p><strong>Before:</strong> {initial_langs}</p>
-            <p><strong>After:</strong> {final_langs}</p>
-            <p><strong>Added:</strong> {final_langs - initial_langs}</p>
+            <p><strong>Before:</strong> {initial_languages}</p>
+            <p><strong>After:</strong> {final_languages}</p>
             <hr>
             <p><a href="/learn/">View all courses →</a></p>
             <p><a href="/debug/count/">Check counts →</a></p>
@@ -53,12 +70,14 @@ def load_all_data(request):
         """
         return HttpResponse(response)
     except Exception as e:
+        import traceback
         return HttpResponse(f"""
         <html>
         <head><title>Data Load Error</title></head>
         <body style="font-family: Arial; padding: 20px;">
             <h1>❌ Error Loading Data</h1>
             <pre>{str(e)}</pre>
+            <pre>{traceback.format_exc()}</pre>
             <p><a href="/debug/count/">Check current counts →</a></p>
         </body>
         </html>
