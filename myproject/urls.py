@@ -23,7 +23,8 @@ def load_all_data(request):
         from base.models import (
             LearningPath, Lesson, Challenge, ProgrammingLanguage, 
             Quiz, QuizQuestion, QuizChoice, CodeSubmission, 
-            UserBadge, LearningProgress, QuizAttempt, QuizAnswer
+            UserBadge, LearningProgress, QuizAttempt, QuizAnswer,
+            Badge  # Add this
         )
         
         # Show current counts before deletion
@@ -31,6 +32,7 @@ def load_all_data(request):
         initial_lessons = Lesson.objects.count()
         initial_challenges = Challenge.objects.count()
         initial_languages = ProgrammingLanguage.objects.count()
+        initial_badges = Badge.objects.count()
         
         # Delete in correct order (child tables first, then parent tables)
         # This avoids foreign key constraint errors
@@ -45,6 +47,7 @@ def load_all_data(request):
         Challenge.objects.all().delete()
         Lesson.objects.all().delete()
         LearningPath.objects.all().delete()
+        Badge.objects.all().delete()  # Add this
         ProgrammingLanguage.objects.all().delete()
         
         # Load the data fresh
@@ -54,6 +57,7 @@ def load_all_data(request):
         final_lessons = Lesson.objects.count()
         final_challenges = Challenge.objects.count()
         final_languages = ProgrammingLanguage.objects.count()
+        final_badges = Badge.objects.count()
         
         response = f"""
         <html>
@@ -72,6 +76,9 @@ def load_all_data(request):
             <h2>Languages:</h2>
             <p><strong>Before:</strong> {initial_languages}</p>
             <p><strong>After:</strong> {final_languages}</p>
+            <h2>Badges:</h2>
+            <p><strong>Before:</strong> {initial_badges}</p>
+            <p><strong>After:</strong> {final_badges}</p>
             <hr>
             <p><a href="/learn/">View all courses →</a></p>
             <p><a href="/debug/count/">Check counts →</a></p>
