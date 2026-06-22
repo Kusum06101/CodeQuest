@@ -25,15 +25,18 @@ A gamified e-learning platform built with Django and Django REST Framework. Lear
 
 ### Homepage
 *The space-themed landing page*
-<!-- Drag homepage.png here -->
+<img width="1920" height="906" alt="homepage" src="https://github.com/user-attachments/assets/6d17c696-2c20-4735-a85d-618481aba318" />
+
 
 ### Course Catalog
 *Browse available courses*
-<!-- Drag course-catalog.png here -->
+<img width="1916" height="896" alt="course-catalog" src="https://github.com/user-attachments/assets/f10df6fb-e947-44c5-ba9b-8391f34ad03a" />
+
 
 ### Dashboard
 *Track your progress*
-<!-- Drag dashboard.png here -->
+<img width="1914" height="912" alt="dashboard" src="https://github.com/user-attachments/assets/ff9fef12-4c51-44fc-9c34-9aa136c4f596" />
+
 
 ---
 
