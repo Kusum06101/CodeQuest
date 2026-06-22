@@ -4,6 +4,10 @@ A gamified e-learning platform built with Django and Django REST Framework. Lear
 
 🔗 **Live Demo:** https://codequest-ak4q.onrender.com
 
+![Django](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/DRF-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ---
 
 ## Features
@@ -15,6 +19,21 @@ A gamified e-learning platform built with Django and Django REST Framework. Lear
 - 🗄️ 10+ relational database models (OneToOne, ForeignKey, ManyToMany)
 - 📱 Responsive frontend with HTML, CSS, and JavaScript
 - 🚀 Deployed on Render
+
+---
+## Screenshots
+
+### Homepage
+*The space-themed landing page*
+<!-- Drag homepage.png here -->
+
+### Course Catalog
+*Browse available courses*
+<!-- Drag course-catalog.png here -->
+
+### Dashboard
+*Track your progress*
+<!-- Drag dashboard.png here -->
 
 ---
 
